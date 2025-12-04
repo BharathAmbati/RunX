@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Orbitron, Nunito } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
+import { AuthModalProvider } from "@/components/providers/auth-modal-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -10,6 +12,18 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  subsets: ["latin"],
+});
+
+const nunito = Nunito({
+  weight: ["400", "600", "700", "800"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-nunito",
 });
 
 export const metadata: Metadata = {
@@ -23,11 +37,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} ${nunito.variable} antialiased font-sans`}
+        style={{ fontFamily: 'var(--font-nunito)' }}
+        suppressHydrationWarning
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+        >
+          <AuthModalProvider>
+            {children}
+          </AuthModalProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
