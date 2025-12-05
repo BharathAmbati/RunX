@@ -109,7 +109,7 @@ export function AppSidebar() {
                                         <Zap className="w-5 h-5 text-white fill-current" />
                                     </motion.div>
                                 </motion.div>
-                                <span className="text-xl font-bold tracking-tighter text-white group-hover:text-cyan-400 transition-colors font-orbitron">
+                                <span className="text-xl font-bold tracking-tighter text-white group-hover:text-cyan-400 transition-colors font-orbitron group-data-[collapsible=icon]:hidden">
                                     RUN<span className="text-cyan-400 group-hover:text-white transition-colors">X</span>
                                 </span>
                             </Link>
@@ -151,7 +151,7 @@ export function AppSidebar() {
                                                 >
                                                     <item.icon className={`w-4 h-4 ${isActive ? "fill-current" : ""}`} />
                                                 </motion.div>
-                                                <span className="font-medium">{item.name}</span>
+                                                <span className="font-medium group-data-[collapsible=icon]:hidden">{item.name}</span>
                                             </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
@@ -187,13 +187,13 @@ export function AppSidebar() {
                                             <User2 className="w-4 h-4 text-cyan-400" />
                                         </motion.div>
                                     </motion.div>
-                                    <div className="flex flex-col items-start">
+                                    <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden">
                                         <span className="text-sm font-medium text-white">RunnerOne</span>
                                         <span className="text-xs text-zinc-500">runner@runx.com</span>
                                     </div>
                                     <motion.div
                                         whileHover={{ y: -2 }}
-                                        className="ml-auto"
+                                        className="ml-auto group-data-[collapsible=icon]:hidden"
                                     >
                                         <ChevronUp />
                                     </motion.div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform, Variants } from "motion/react";
 import { Zap, Battery, Gauge, Flame, Wind, Activity, ArrowRight } from "lucide-react";
 import { useRef } from "react";
 
@@ -63,11 +63,11 @@ const features = [
         border: "group-hover:border-purple-500/50",
         bg: "group-hover:bg-purple-500/10",
         glow: "from-purple-500",
-        animation: { y: [0, -8, 0], transition: { duration: 0.6, repeat: Infinity, repeatType: "reverse" } } // Energetic bounce
+        animation: { y: [0, -8, 0], transition: { duration: 0.6, repeat: Infinity, repeatType: "reverse" as const } } // Energetic bounce
     }
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
@@ -77,7 +77,7 @@ const containerVariants = {
     }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
         opacity: 1,
@@ -129,8 +129,8 @@ export default function PowerSection() {
                         <Zap className="w-12 h-12 text-white fill-white relative z-10" />
                     </motion.div>
 
-                    <h2 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-wider">
-                        UNLEASH YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-600">POTENTIAL</span>
+                    <h2 className="font-exo2 text-5xl md:text-7xl font-black text-white mb-6 tracking-wider">
+                        UNLEASH YOUR <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-600">POTENTIAL</span>
                     </h2>
 
                     <p className="text-zinc-400 max-w-2xl mx-auto text-xl">

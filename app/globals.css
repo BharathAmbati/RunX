@@ -18,7 +18,7 @@
   --chart-3: hsl(215 100% 55%);
   --chart-4: hsl(230 90% 60%);
   --chart-5: hsl(245 80% 65%);
-  
+
   /* Sidebar variables */
   --sidebar: #0a0a0a;
   --sidebar-foreground: #ededed;
@@ -182,14 +182,12 @@ body {
 @layer components {
   .gradient-button {
     @apply relative appearance-none cursor-pointer;
-    background: radial-gradient(
-      var(--spread-x) var(--spread-y) at var(--pos-x) var(--pos-y),
-      var(--color-1) var(--stop-1),
-      var(--color-2) var(--stop-2),
-      var(--color-3) var(--stop-3),
-      var(--color-4) var(--stop-4),
-      var(--color-5) var(--stop-5)
-    );
+    background: radial-gradient(var(--spread-x) var(--spread-y) at var(--pos-x) var(--pos-y),
+        var(--color-1) var(--stop-1),
+        var(--color-2) var(--stop-2),
+        var(--color-3) var(--stop-3),
+        var(--color-4) var(--stop-4),
+        var(--color-5) var(--stop-5));
     transition:
       --pos-x 0.5s,
       --pos-y 0.5s,
@@ -216,11 +214,9 @@ body {
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(
-      var(--border-angle),
-      var(--border-color-1),
-      var(--border-color-2)
-    );
+    background: linear-gradient(var(--border-angle),
+        var(--border-color-1),
+        var(--border-color-2));
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
     pointer-events: none;
