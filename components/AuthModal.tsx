@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const [isLogin, setIsLogin] = useState(true);
@@ -13,6 +14,7 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
+    const router = useRouter();
 
     const supabase = createClient();
 
@@ -33,7 +35,8 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
                 if (error) throw error;
 
                 onClose();
-                window.location.reload();
+                router.push('/dashboard');
+                router.refresh();
             } else {
                 // Sign up
                 const { error } = await supabase.auth.signUp({

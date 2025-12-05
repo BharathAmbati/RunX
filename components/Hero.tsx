@@ -53,12 +53,25 @@ export default function Hero() {
                     transition={{ duration: 0.8, delay: 0.6 }}
                     className="flex flex-col md:flex-row gap-4 justify-center"
                 >
-                    <button 
+                    <motion.button 
                         onClick={openModal}
-                        className="px-8 py-4 bg-cyan-500 text-white font-bold rounded-full hover:bg-cyan-400 transition-all shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]"
+                        whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(6,182,212,0.8)" }}
+                        whileTap={{ scale: 0.95 }}
+                        initial={{ boxShadow: "0 0 20px rgba(6,182,212,0.4)" }}
+                        animate={{ 
+                            boxShadow: ["0 0 20px rgba(6,182,212,0.4)", "0 0 40px rgba(6,182,212,0.6)", "0 0 20px rgba(6,182,212,0.4)"],
+                        }}
+                        transition={{
+                            boxShadow: {
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }
+                        }}
+                        className="px-8 py-4 bg-cyan-500 text-white font-bold rounded-full hover:bg-cyan-400 transition-colors"
                     >
                         START YOUR JOURNEY
-                    </button>
+                    </motion.button>
                    
                 </motion.div>
             </div>

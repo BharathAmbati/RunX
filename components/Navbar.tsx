@@ -20,7 +20,6 @@ export default function Navbar() {
     const navItems = [
         { name: 'Home', url: '/', icon: Home },
         { name: 'Learn', url: '/learn', icon: Zap },
-        { name: 'Leaderboard', url: '/leaderboard', icon: Trophy },
         { name: 'About', url: '/#about', icon: User }
     ];
 
