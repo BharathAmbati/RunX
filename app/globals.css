@@ -18,6 +18,14 @@
   --chart-3: hsl(215 100% 55%);
   --chart-4: hsl(230 90% 60%);
   --chart-5: hsl(245 80% 65%);
+  
+  /* Sidebar variables */
+  --sidebar: #0a0a0a;
+  --sidebar-foreground: #ededed;
+  --sidebar-border: #27272a;
+  --sidebar-accent: rgba(6, 182, 212, 0.1);
+  --sidebar-accent-foreground: #06b6d4;
+  --sidebar-ring: #06b6d4;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,7 +44,11 @@ body {
 
 @layer utilities {
   .font-orbitron {
-    font-family: 'Orbitron', sans-serif;
+    font-family: var(--font-orbitron), 'Orbitron', sans-serif;
+  }
+
+  .font-exo2 {
+    font-family: var(--font-exo2), 'Exo 2', sans-serif;
   }
 
   .pt-sans-regular {
@@ -61,5 +73,239 @@ body {
     font-family: var(--font-pt-sans), "PT Sans", sans-serif;
     font-weight: 700;
     font-style: italic;
+  }
+}
+
+/* Gradient Button Custom Properties */
+@property --pos-x {
+  syntax: '<percentage>';
+  initial-value: 11.14%;
+  inherits: false;
+}
+
+@property --pos-y {
+  syntax: '<percentage>';
+  initial-value: 140%;
+  inherits: false;
+}
+
+@property --spread-x {
+  syntax: '<percentage>';
+  initial-value: 150%;
+  inherits: false;
+}
+
+@property --spread-y {
+  syntax: '<percentage>';
+  initial-value: 180.06%;
+  inherits: false;
+}
+
+@property --color-1 {
+  syntax: '<color>';
+  initial-value: #000;
+  inherits: false;
+}
+
+@property --color-2 {
+  syntax: '<color>';
+  initial-value: #08012c;
+  inherits: false;
+}
+
+@property --color-3 {
+  syntax: '<color>';
+  initial-value: #4e1e40;
+  inherits: false;
+}
+
+@property --color-4 {
+  syntax: '<color>';
+  initial-value: #70464e;
+  inherits: false;
+}
+
+@property --color-5 {
+  syntax: '<color>';
+  initial-value: #88394c;
+  inherits: false;
+}
+
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 20deg;
+  inherits: true;
+}
+
+@property --border-color-1 {
+  syntax: '<color>';
+  initial-value: hsla(340, 75%, 60%, 0.2);
+  inherits: true;
+}
+
+@property --border-color-2 {
+  syntax: '<color>';
+  initial-value: hsla(340, 75%, 40%, 0.75);
+  inherits: true;
+}
+
+@property --stop-1 {
+  syntax: '<percentage>';
+  initial-value: 37.35%;
+  inherits: false;
+}
+
+@property --stop-2 {
+  syntax: '<percentage>';
+  initial-value: 61.36%;
+  inherits: false;
+}
+
+@property --stop-3 {
+  syntax: '<percentage>';
+  initial-value: 78.42%;
+  inherits: false;
+}
+
+@property --stop-4 {
+  syntax: '<percentage>';
+  initial-value: 89.52%;
+  inherits: false;
+}
+
+@property --stop-5 {
+  syntax: '<percentage>';
+  initial-value: 100%;
+  inherits: false;
+}
+
+@layer components {
+  .gradient-button {
+    @apply relative appearance-none cursor-pointer;
+    background: radial-gradient(
+      var(--spread-x) var(--spread-y) at var(--pos-x) var(--pos-y),
+      var(--color-1) var(--stop-1),
+      var(--color-2) var(--stop-2),
+      var(--color-3) var(--stop-3),
+      var(--color-4) var(--stop-4),
+      var(--color-5) var(--stop-5)
+    );
+    transition:
+      --pos-x 0.5s,
+      --pos-y 0.5s,
+      --spread-x 0.5s,
+      --spread-y 0.5s,
+      --color-1 0.5s,
+      --color-2 0.5s,
+      --color-3 0.5s,
+      --color-4 0.5s,
+      --color-5 0.5s,
+      --border-angle 0.5s,
+      --border-color-1 0.5s,
+      --border-color-2 0.5s,
+      --stop-1 0.5s,
+      --stop-2 0.5s,
+      --stop-3 0.5s,
+      --stop-4 0.5s,
+      --stop-5 0.5s;
+  }
+
+  .gradient-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      var(--border-angle),
+      var(--border-color-1),
+      var(--border-color-2)
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .gradient-button:hover {
+    --pos-x: 0%;
+    --pos-y: 91.51%;
+    --spread-x: 120.24%;
+    --spread-y: 103.18%;
+    --color-1: #c96287;
+    --color-2: #c66c64;
+    --color-3: #cc7d23;
+    --color-4: #37140a;
+    --color-5: #000;
+    --border-angle: 190deg;
+    --border-color-1: hsla(340, 78%, 90%, 0.1);
+    --border-color-2: hsla(340, 75%, 90%, 0.6);
+    --stop-1: 0%;
+    --stop-2: 8.8%;
+    --stop-3: 21.44%;
+    --stop-4: 71.34%;
+    --stop-5: 85.76%;
+  }
+
+  /* Cyan variant for Start Run */
+  .gradient-button-cyan {
+    --color-1: #000011;
+    --color-2: #0a2a3a;
+    --color-3: #0d4a5a;
+    --color-4: #0891b2;
+    --color-5: #06b6d4;
+    --border-color-1: hsla(185, 75%, 60%, 0.2);
+    --border-color-2: hsla(185, 75%, 40%, 0.75);
+  }
+
+  .gradient-button-cyan:hover {
+    --color-1: #06b6d4;
+    --color-2: #0891b2;
+    --color-3: #0e7490;
+    --color-4: #0a2a3a;
+    --color-5: #000;
+    --border-color-1: hsla(185, 78%, 90%, 0.1);
+    --border-color-2: hsla(185, 75%, 90%, 0.6);
+  }
+
+  /* Purple variant for Plan Route */
+  .gradient-button-purple {
+    --color-1: #110022;
+    --color-2: #2a1a4a;
+    --color-3: #4c1d95;
+    --color-4: #7c3aed;
+    --color-5: #a855f7;
+    --border-color-1: hsla(270, 75%, 60%, 0.2);
+    --border-color-2: hsla(270, 75%, 40%, 0.75);
+  }
+
+  .gradient-button-purple:hover {
+    --color-1: #a855f7;
+    --color-2: #7c3aed;
+    --color-3: #6d28d9;
+    --color-4: #2a1a4a;
+    --color-5: #000;
+    --border-color-1: hsla(270, 78%, 90%, 0.1);
+    --border-color-2: hsla(270, 75%, 90%, 0.6);
+  }
+
+  /* Orange variant for Set Timer */
+  .gradient-button-orange {
+    --color-1: #1a0a00;
+    --color-2: #3a1a0a;
+    --color-3: #7c2d12;
+    --color-4: #ea580c;
+    --color-5: #f97316;
+    --border-color-1: hsla(25, 75%, 60%, 0.2);
+    --border-color-2: hsla(25, 75%, 40%, 0.75);
+  }
+
+  .gradient-button-orange:hover {
+    --color-1: #f97316;
+    --color-2: #ea580c;
+    --color-3: #c2410c;
+    --color-4: #3a1a0a;
+    --color-5: #000;
+    --border-color-1: hsla(25, 78%, 90%, 0.1);
+    --border-color-2: hsla(25, 75%, 90%, 0.6);
   }
 }

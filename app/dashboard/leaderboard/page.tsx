@@ -66,7 +66,7 @@ export default function LeaderboardPage() {
                         <Zap className="w-4 h-4 text-cyan-400" />
                         <span className="text-sm font-medium text-cyan-400">Live Rankings</span>
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-bold text-white font-orbitron tracking-tighter mb-4">
+                    <h1 className="font-exo2 text-4xl md:text-6xl font-bold text-white tracking-tighter mb-4">
                         GLOBAL <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">LEADERBOARD</span>
                     </h1>
                     <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
@@ -112,7 +112,7 @@ export default function LeaderboardPage() {
                         transition={{ delay: 0.4, duration: 0.6 }}
                         className="p-6 rounded-2xl bg-zinc-900/60 border border-white/10 backdrop-blur-xl"
                     >
-                        <h3 className="text-lg font-bold text-white font-orbitron mb-6 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                             <Target className="w-5 h-5 text-cyan-400" />
                             Distance Comparison
                         </h3>
@@ -139,7 +139,7 @@ export default function LeaderboardPage() {
                         transition={{ delay: 0.5, duration: 0.6 }}
                         className="p-6 rounded-2xl bg-zinc-900/60 border border-white/10 backdrop-blur-xl"
                     >
-                        <h3 className="text-lg font-bold text-white font-orbitron mb-6 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                             <Award className="w-5 h-5 text-purple-400" />
                             Performance Index
                         </h3>
@@ -158,7 +158,7 @@ export default function LeaderboardPage() {
                         transition={{ delay: 0.6, duration: 0.6 }}
                         className="p-6 rounded-2xl bg-zinc-900/60 border border-white/10 backdrop-blur-xl lg:col-span-2"
                     >
-                        <h3 className="text-lg font-bold text-white font-orbitron mb-6 flex items-center gap-2">
+                        <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-green-400" />
                             Weekly Progress - Top 3 Runners
                         </h3>
@@ -202,7 +202,7 @@ export default function LeaderboardPage() {
                             <div className="p-2 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg">
                                 <Trophy className="w-5 h-5 text-white" />
                             </div>
-                            <h3 className="text-lg font-bold text-white font-orbitron">Top Runners</h3>
+                            <h3 className="text-lg font-bold text-white">Top Runners</h3>
                         </div>
                         <div className="text-xs text-zinc-500">Updated 2 min ago</div>
                     </div>

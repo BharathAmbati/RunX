@@ -36,7 +36,7 @@ export default function Navbar() {
                     <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 group-hover:from-yellow-500 group-hover:to-orange-500 transition-all duration-500 shadow-[0_0_20px_rgba(6,182,212,0.5)] group-hover:shadow-[0_0_30px_rgba(234,179,8,0.6)] cursor-pointer">
                         <Zap className="w-6 h-6 text-white fill-current group-hover:scale-110 transition-transform" />
                     </div>
-                    <span className="text-2xl font-bold tracking-tighter text-white font-orbitron transition-colors hidden md:inline-block">
+                    <span className="text-2xl font-bold tracking-tighter text-white transition-colors hidden md:inline-block font-orbitron">
                         RUN<span className="text-cyan-400 group-hover:text-yellow-400 transition-colors">X</span>
                     </span>
                 </motion.div>

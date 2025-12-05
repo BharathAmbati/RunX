@@ -129,7 +129,7 @@ export default function PowerSection() {
                         <Zap className="w-12 h-12 text-white fill-white relative z-10" />
                     </motion.div>
 
-                    <h2 className="text-5xl md:text-7xl font-black text-white mb-6 font-orbitron tracking-wider">
+                    <h2 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-wider">
                         UNLEASH YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-600">POTENTIAL</span>
                     </h2>
 
@@ -172,7 +172,7 @@ export default function PowerSection() {
                                     </motion.div>
                                 </div>
 
-                                <h3 className="text-2xl font-bold text-white mb-3 font-orbitron">{item.title}</h3>
+                                <h3 className="text-2xl font-bold text-white mb-3">{item.title}</h3>
                                 <p className="text-zinc-400 leading-relaxed">{item.desc}</p>
                             </div>
                         </motion.div>

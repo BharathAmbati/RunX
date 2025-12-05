@@ -103,7 +103,7 @@ export default function LeaderboardPage() {
                     transition={{ duration: 0.6 }}
                     className="container mx-auto text-center"
                 >
-                    <h1 className="text-4xl md:text-6xl font-bold mb-4 font-orbitron">
+                    <h1 className="text-4xl md:text-6xl font-bold mb-4">
                         <span className="text-cyan-400">LEADER</span>BOARD
                     </h1>
                     <p className="text-zinc-400 max-w-xl mx-auto">
@@ -203,7 +203,7 @@ export default function LeaderboardPage() {
                                     </RadialBarChart>
                                 </ChartContainer>
                                 <div className="absolute text-center">
-                                    <p className="text-4xl font-bold text-cyan-400 font-orbitron">78%</p>
+                                    <p className="text-4xl font-bold text-cyan-400">78%</p>
                                     <p className="text-xs text-zinc-500">Complete</p>
                                 </div>
                             </CardContent>
@@ -283,15 +283,15 @@ export default function LeaderboardPage() {
                             <CardContent className="space-y-4">
                                 <div className="flex justify-between items-center p-3 rounded-lg bg-black/30">
                                     <span className="text-zinc-400 text-sm">Total Runs</span>
-                                    <span className="text-2xl font-bold text-white font-orbitron">139</span>
+                                    <span className="text-2xl font-bold text-white">139</span>
                                 </div>
                                 <div className="flex justify-between items-center p-3 rounded-lg bg-black/30">
                                     <span className="text-zinc-400 text-sm">Distance</span>
-                                    <span className="text-2xl font-bold text-cyan-400 font-orbitron">532km</span>
+                                    <span className="text-2xl font-bold text-cyan-400">532km</span>
                                 </div>
                                 <div className="flex justify-between items-center p-3 rounded-lg bg-black/30">
                                     <span className="text-zinc-400 text-sm">Active Users</span>
-                                    <span className="text-2xl font-bold text-white font-orbitron">847</span>
+                                    <span className="text-2xl font-bold text-white">847</span>
                                 </div>
                             </CardContent>
                         </Card>

@@ -38,7 +38,7 @@ export function Sidebar() {
                 <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 shadow-[0_0_15px_rgba(6,182,212,0.5)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.8)] transition-all">
                     <Zap className="w-5 h-5 text-white fill-current group-hover:scale-110 transition-transform" />
                 </div>
-                <span className="text-xl font-bold tracking-tighter text-white font-orbitron hidden md:block group-hover:text-cyan-400 transition-colors">
+                <span className="text-xl font-bold tracking-tighter text-white hidden md:block group-hover:text-cyan-400 transition-colors font-orbitron">
                     RUN<span className="text-cyan-400 group-hover:text-white transition-colors">X</span>
                 </span>
             </Link>

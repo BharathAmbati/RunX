@@ -63,7 +63,7 @@ export default function StatsSection() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 font-orbitron">
+                    <h2 className="font-exo2 text-4xl md:text-5xl font-bold text-white mb-4">
                         JOIN THE <span className="text-cyan-400">MOVEMENT</span>
                     </h2>
                     <p className="text-zinc-400 max-w-2xl mx-auto">
@@ -93,7 +93,7 @@ export default function StatsSection() {
                                 </motion.div>
 
                                 {/* Value */}
-                                <div className="text-4xl md:text-5xl font-black text-white mb-2 font-orbitron flex justify-center items-center gap-1">
+                                <div className="text-4xl md:text-5xl font-black text-white mb-2 flex justify-center items-center gap-1">
                                     <Counter value={stat.value} suffix={stat.suffix} />
                                     <span>{stat.suffix}</span>
                                 </div>

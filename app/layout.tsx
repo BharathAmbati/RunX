@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Orbitron, Nunito } from "next/font/google";
+import { Geist, Geist_Mono, Exo_2, Roboto, Orbitron } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthModalProvider } from "@/components/providers/auth-modal-provider";
 import "./globals.css";
@@ -19,11 +19,18 @@ const orbitron = Orbitron({
   subsets: ["latin"],
 });
 
-const nunito = Nunito({
-  weight: ["400", "600", "700", "800"],
+const exo2 = Exo_2({
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
   style: ["normal", "italic"],
   subsets: ["latin"],
-  variable: "--font-nunito",
+  variable: "--font-exo2",
+});
+
+const roboto = Roboto({
+  weight: ["300", "400", "500", "700", "900"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
+  variable: "--font-roboto",
 });
 
 export const metadata: Metadata = {
@@ -39,8 +46,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} ${nunito.variable} antialiased font-sans`}
-        style={{ fontFamily: 'var(--font-nunito)' }}
+        className={`${geistSans.variable} ${geistMono.variable} ${exo2.variable} ${orbitron.variable} ${roboto.variable} antialiased`}
+        style={{ fontFamily: 'var(--font-roboto)' }}
         suppressHydrationWarning
       >
         <ThemeProvider
@@ -56,3 +63,4 @@ export default function RootLayout({
     </html>
   );
 }
+

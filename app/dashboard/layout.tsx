@@ -1,4 +1,6 @@
-import { Sidebar } from "@/components/dashboard/Sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/dashboard/AppSidebar";
+import { Separator } from "@/components/ui/separator";
 
 export default function DashboardLayout({
     children,
@@ -6,13 +8,23 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-black text-white selection:bg-cyan-500/30 flex">
-            <Sidebar />
-            <main className="flex-1 ml-20 md:ml-64 p-8 overflow-y-auto">
-                <div className="max-w-7xl mx-auto">
-                    {children}
-                </div>
-            </main>
-        </div>
+        <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset className="bg-black">
+                {/* Header with trigger */}
+                <header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-4 md:px-6">
+                    <SidebarTrigger className="-ml-1 text-zinc-400 hover:text-white hover:bg-white/5" />
+                    <Separator orientation="vertical" className="mr-2 h-4 bg-white/10" />
+                </header>
+                
+                {/* Main content */}
+                <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+                    <div className="max-w-7xl mx-auto">
+                        {children}
+                    </div>
+                </main>
+            </SidebarInset>
+        </SidebarProvider>
     );
 }
+

@@ -104,7 +104,7 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
                                 <X className="w-6 h-6" />
                             </button>
 
-                            <h2 className="text-2xl font-bold text-white mb-6 font-orbitron">
+                            <h2 className="text-2xl font-bold text-white mb-6">
                                 {isLogin ? "WELCOME BACK" : "JOIN THE FUTURE"}
                             </h2>
 

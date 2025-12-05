@@ -61,7 +61,7 @@ export default function LearnSection() {
                     className="text-center mb-16"
                 >
                     <motion.h2
-                        className="text-4xl md:text-5xl font-bold text-white mb-4 font-orbitron"
+                        className="text-4xl md:text-5xl font-bold text-white mb-4"
                         whileInView={{ scale: [0.9, 1] }}
                         transition={{ duration: 0.5 }}
                     >

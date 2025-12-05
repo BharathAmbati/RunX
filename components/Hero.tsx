@@ -20,7 +20,7 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
                 >
-                    <h2 className="text-cyan-400 font-bold tracking-[0.2em] uppercase mb-4">
+                    <h2 className="font-exo2 text-cyan-400 font-bold tracking-[0.2em] uppercase mb-4">
                         The Future of Running
                     </h2>
                 </motion.div>
@@ -29,7 +29,7 @@ export default function Hero() {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-6xl md:text-8xl font-black text-white mb-6 tracking-tighter font-orbitron"
+                    className="font-exo2 text-6xl md:text-8xl font-black text-white mb-6 tracking-tighter"
                 >
                     RUN BEYOND
                     <br />

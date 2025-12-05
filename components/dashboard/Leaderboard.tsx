@@ -19,7 +19,7 @@ export function Leaderboard() {
                     <div className="p-2 bg-yellow-500/10 rounded-lg">
                         <Trophy className="w-5 h-5 text-yellow-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-white font-orbitron">Top Runners</h3>
+                    <h3 className="text-lg font-bold text-white">Top Runners</h3>
                 </div>
                 <button className="text-xs font-medium text-cyan-400 hover:text-cyan-300 transition-colors">
                     View All

@@ -67,11 +67,11 @@ export default function LoginPage() {
                 <div className="p-8">
                     <div className="text-center mb-8">
                         <Link href="/" className="inline-block mb-6">
-                            <span className="text-3xl font-black italic tracking-tighter text-white">
+                            <span className="text-3xl font-black italic tracking-tighter text-white font-orbitron">
                                 RUN<span className="text-cyan-500">X</span>
                             </span>
                         </Link>
-                        <h2 className="text-2xl font-bold text-white font-orbitron">WELCOME BACK</h2>
+                        <h2 className="text-2xl font-bold text-white">WELCOME BACK</h2>
                         <p className="text-zinc-400 mt-2">Sign in to continue your journey</p>
                     </div>
 

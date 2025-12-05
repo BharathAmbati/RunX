@@ -17,7 +17,7 @@ export default function ContactSection() {
                     viewport={{ once: true }}
                     className="text-center mb-16"
                 >
-                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 font-orbitron">
+                    <h2 className="font-exo2 text-4xl md:text-5xl font-bold text-white mb-4">
                         GET IN <span className="text-cyan-400">TOUCH</span>
                     </h2>
                     <p className="text-zinc-400 max-w-2xl mx-auto">
@@ -34,7 +34,7 @@ export default function ContactSection() {
                         className="space-y-8"
                     >
                         <div className="p-8 rounded-3xl bg-zinc-900/50 border border-white/5 backdrop-blur-sm">
-                            <h3 className="text-2xl font-bold text-white mb-6 font-orbitron">Contact Info</h3>
+                            <h3 className="text-2xl font-bold text-white mb-6">Contact Info</h3>
                             <div className="space-y-6">
                                 <div className="flex items-center gap-4 group">
                                     <div className="p-3 rounded-xl bg-zinc-800 group-hover:bg-cyan-500/20 group-hover:text-cyan-400 transition-colors text-zinc-400">
@@ -112,7 +112,7 @@ export default function ContactSection() {
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold font-orbitron tracking-wider flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-shadow"
+                                className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold tracking-wider flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-shadow"
                             >
                                 SEND MESSAGE
                                 <Send className="w-4 h-4" />
