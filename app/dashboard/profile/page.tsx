@@ -122,9 +122,8 @@ export default function ProfilePage() {
         <div className="space-y-8 max-w-2xl">
             {/* Header */}
             <motion.div
-                initial={{ opacity: 0, x: -100 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, type: "spring", stiffness: 80, damping: 15 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
             >
                 <h1 className="text-3xl font-bold text-white mb-2 font-exo2">Profile</h1>
                 <p className="text-zinc-400">Manage your personal information</p>
@@ -132,9 +131,9 @@ export default function ProfilePage() {
 
             {/* Avatar Section */}
             <motion.div
-                initial={{ opacity: 0, x: -100 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.15, type: "spring", stiffness: 80, damping: 15 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
             >
                 <Card className="bg-zinc-900/50 border-white/10 backdrop-blur-sm overflow-hidden">
                     <CardHeader>
@@ -154,19 +153,8 @@ export default function ProfilePage() {
                         />
                         <motion.div
                             onClick={handleAvatarClick}
-                            whileHover={{ scale: 1.1, rotate: 5 }}
-                            whileTap={{ scale: 0.95 }}
-                            animate={{ 
-                                boxShadow: [
-                                    "0 0 0px rgba(6,182,212,0)",
-                                    "0 0 20px rgba(6,182,212,0.4)",
-                                    "0 0 0px rgba(6,182,212,0)"
-                                ]
-                            }}
-                            transition={{ 
-                                boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                                scale: { type: "spring", stiffness: 300 }
-                            }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.98 }}
                             className="relative w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border-2 border-cyan-500/30 flex items-center justify-center cursor-pointer group overflow-hidden"
                         >
                             {uploading ? (
@@ -179,14 +167,7 @@ export default function ProfilePage() {
                                     className="object-cover"
                                 />
                             ) : (
-                                <>
-                                    <motion.div
-                                        animate={{ rotate: [0, 360] }}
-                                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                                        className="absolute inset-0 rounded-full border-2 border-transparent border-t-cyan-500/50"
-                                    />
-                                    <User className="w-8 h-8 text-cyan-400" />
-                                </>
+                                <User className="w-8 h-8 text-cyan-400" />
                             )}
                             <motion.div 
                                 initial={{ opacity: 0 }}
@@ -210,9 +191,9 @@ export default function ProfilePage() {
 
             {/* Personal Info */}
             <motion.div
-                initial={{ opacity: 0, x: -100 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, type: "spring", stiffness: 80, damping: 15 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
             >
                 <Card className="bg-zinc-900/50 border-white/10 backdrop-blur-sm">
                     <CardHeader>
@@ -291,7 +272,7 @@ export default function ProfilePage() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.8 }}
-                            whileHover={{ scale: 1.02, y: -2 }} 
+                            whileHover={{ scale: 1.02 }} 
                             whileTap={{ scale: 0.98 }}
                         >
                             <Button
