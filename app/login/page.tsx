@@ -29,7 +29,7 @@ export default function LoginPage() {
 
             if (error) throw error;
             
-            router.push("/");
+            router.push("/dashboard");
             router.refresh();
         } catch (err) {
             setError(err instanceof Error ? err.message : "An error occurred");
@@ -46,7 +46,7 @@ export default function LoginPage() {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}/auth/callback`,
+                    redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
                 },
             });
 

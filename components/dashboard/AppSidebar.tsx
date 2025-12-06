@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, Trophy, Settings, LogOut, Activity, Zap, ChevronUp, User2 } from "lucide-react";
@@ -79,6 +80,20 @@ export function AppSidebar() {
         router.refresh();
     };
 
+    const [userEmail, setUserEmail] = React.useState<string>("runner@runx.com");
+    const [userName, setUserName] = React.useState<string>("RunnerOne");
+
+    React.useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                setUserEmail(user.email || "runner@runx.com");
+                setUserName(user.user_metadata?.full_name || user.user_metadata?.username || user.email?.split('@')[0] || "RunnerOne");
+            }
+        };
+        getUser();
+    }, []);
+
     return (
         <Sidebar collapsible="icon" className="border-r border-white/10 bg-black/50 backdrop-blur-xl">
             {/* Logo Header */}
@@ -86,7 +101,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild size="lg" className="hover:bg-white/5">
-                            <Link href="/" className="flex items-center gap-3 group">
+                            <Link href="/" className="flex items-center gap-2 group -ml-1">
                                 <motion.div 
                                     className="relative flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 shadow-[0_0_15px_rgba(6,182,212,0.5)]"
                                     animate={{ 
@@ -173,7 +188,7 @@ export function AppSidebar() {
                                     className="text-zinc-400 hover:text-white hover:bg-white/5"
                                 >
                                     <motion.div 
-                                        className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30"
+                                        className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 shrink-0"
                                         whileHover={{ scale: 1.1, borderColor: "rgba(6,182,212,0.8)" }}
                                         animate={{ 
                                             borderColor: ["rgba(6,182,212,0.3)", "rgba(6,182,212,0.6)", "rgba(6,182,212,0.3)"]
@@ -187,13 +202,13 @@ export function AppSidebar() {
                                             <User2 className="w-4 h-4 text-cyan-400" />
                                         </motion.div>
                                     </motion.div>
-                                    <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden">
-                                        <span className="text-sm font-medium text-white">RunnerOne</span>
-                                        <span className="text-xs text-zinc-500">runner@runx.com</span>
+                                    <div className="flex flex-col items-start min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+                                        <span className="text-sm font-medium text-white truncate w-full">{userName}</span>
+                                        <span className="text-xs text-zinc-500 truncate w-full">{userEmail}</span>
                                     </div>
                                     <motion.div
                                         whileHover={{ y: -2 }}
-                                        className="ml-auto group-data-[collapsible=icon]:hidden"
+                                        className="ml-auto shrink-0 group-data-[collapsible=icon]:hidden"
                                     >
                                         <ChevronUp />
                                     </motion.div>
@@ -203,18 +218,22 @@ export function AppSidebar() {
                                 side="top"
                                 className="w-[--radix-popper-anchor-width] bg-zinc-900 border-white/10"
                             >
-                                <DropdownMenuItem className="text-zinc-400 hover:text-white focus:text-white focus:bg-white/5">
-                                    <motion.div whileHover={{ scale: 1.2 }}>
-                                        <User2 className="mr-2 h-4 w-4" />
-                                    </motion.div>
-                                    Profile
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="text-zinc-400 hover:text-white focus:text-white focus:bg-white/5">
-                                    <motion.div whileHover={{ rotate: 90 }}>
-                                        <Settings className="mr-2 h-4 w-4" />
-                                    </motion.div>
-                                    Settings
-                                </DropdownMenuItem>
+                                <Link href="/dashboard/profile">
+                                    <DropdownMenuItem className="text-zinc-400 hover:text-white focus:text-white focus:bg-white/5 cursor-pointer">
+                                        <motion.div whileHover={{ scale: 1.2 }}>
+                                            <User2 className="mr-2 h-4 w-4" />
+                                        </motion.div>
+                                        Profile
+                                    </DropdownMenuItem>
+                                </Link>
+                                <Link href="/dashboard/settings">
+                                    <DropdownMenuItem className="text-zinc-400 hover:text-white focus:text-white focus:bg-white/5 cursor-pointer">
+                                        <motion.div whileHover={{ rotate: 90 }}>
+                                            <Settings className="mr-2 h-4 w-4" />
+                                        </motion.div>
+                                        Settings
+                                    </DropdownMenuItem>
+                                </Link>
                                 <DropdownMenuItem 
                                     onClick={handleSignOut}
                                     className="text-red-400 hover:text-red-300 focus:text-red-300 focus:bg-red-500/10"
