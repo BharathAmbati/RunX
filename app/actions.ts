@@ -5,6 +5,9 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 export async function login(formData: FormData) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return { error: 'Server configuration error: Missing Supabase environment variables' }
+  }
   const supabase = await createClient()
 
   const email = formData.get('email') as string
@@ -28,6 +31,9 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return { error: 'Server configuration error: Missing Supabase environment variables' }
+  }
   const supabase = await createClient()
 
   const email = formData.get('email') as string
@@ -62,3 +68,4 @@ export async function signOut() {
   revalidatePath('/', 'layout')
   redirect('/')
 }
+
