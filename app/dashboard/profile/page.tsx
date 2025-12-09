@@ -121,14 +121,10 @@ export default function ProfilePage() {
     return (
         <div className="space-y-8 max-w-2xl">
             {/* Header */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-            >
+            <div>
                 <h1 className="text-3xl font-bold text-white mb-2 font-exo2">Profile</h1>
                 <p className="text-zinc-400">Manage your personal information</p>
-            </motion.div>
+            </div>
 
             {/* Avatar Section */}
             <motion.div

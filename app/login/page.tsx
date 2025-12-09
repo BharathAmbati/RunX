@@ -29,8 +29,8 @@ export default function LoginPage() {
 
             if (error) throw error;
             
-            router.push("/dashboard");
-            router.refresh();
+            // Use window.location for a hard redirect to ensure session is picked up
+            window.location.href = '/dashboard';
         } catch (err) {
             setError(err instanceof Error ? err.message : "An error occurred");
         } finally {

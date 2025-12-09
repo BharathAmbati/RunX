@@ -35,8 +35,8 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
                 if (error) throw error;
 
                 onClose();
-                router.push('/dashboard');
-                router.refresh();
+                // Use window.location for a hard redirect to ensure session is picked up
+                window.location.href = '/dashboard';
             } else {
                 // Sign up
                 const { error } = await supabase.auth.signUp({
