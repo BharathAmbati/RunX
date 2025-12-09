@@ -38,9 +38,9 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
                 const response = await login(formData);
                 if (response?.error) {
                     setError(response.error);
-                } else {
-                    // Successful login will redirect, so we can just close the modal
-                    // The redirect might cause the component to unmount before this runs, which is fine
+                } else if (response?.success) {
+                    // Successful login - hard redirect to Dashboard to ensure session cookies are picked up
+                    window.location.href = '/dashboard';
                     onClose();
                 }
             } else {

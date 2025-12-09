@@ -30,8 +30,10 @@ export default function LoginPage() {
             const response = await login(formData);
             if (response?.error) {
                 setError(response.error);
+            } else if (response?.success) {
+                // Successful login - hard redirect to Dashboard
+                window.location.href = '/dashboard';
             }
-            // If successful, the server action redirects
         } catch (err) {
             setError(err instanceof Error ? err.message : "An error occurred");
         } finally {
