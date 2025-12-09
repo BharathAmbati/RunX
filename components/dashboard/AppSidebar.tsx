@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Home, Trophy, Settings, LogOut, Activity, Zap, ChevronUp, User2 } from "lucide-react";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
+import { signOut } from "@/app/actions";
 
 import {
     Sidebar,
@@ -75,9 +76,7 @@ export function AppSidebar() {
     const supabase = createClient();
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut();
-        router.push("/");
-        router.refresh();
+        await signOut();
     };
 
     const [userEmail, setUserEmail] = React.useState<string>("runner@runx.com");

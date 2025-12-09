@@ -6,6 +6,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signup } from "@/app/actions";
 
 export default function SignupPage() {
     const [email, setEmail] = useState("");
@@ -24,20 +25,20 @@ export default function SignupPage() {
         setError(null);
         setMessage(null);
 
-        try {
-            const { error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        username: username,
-                    },
-                },
-            });
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('username', username);
 
-            if (error) throw error;
-            
-            setMessage("Check your email for the confirmation link!");
+        try {
+            const response = await signup(formData);
+            if (response?.error) {
+                setError(response.error);
+            } else if (response?.success) {
+                setMessage(response.success);
+                // Clear password to prevent accidental re-submission
+                setPassword("");
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : "An error occurred");
         } finally {

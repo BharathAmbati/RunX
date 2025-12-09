@@ -6,6 +6,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { login } from "@/app/actions";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -21,16 +22,16 @@ export default function LoginPage() {
         setLoading(true);
         setError(null);
 
-        try {
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
 
-            if (error) throw error;
-            
-            // Use window.location for a hard redirect to ensure session is picked up
-            window.location.href = '/dashboard';
+        try {
+            const response = await login(formData);
+            if (response?.error) {
+                setError(response.error);
+            }
+            // If successful, the server action redirects
         } catch (err) {
             setError(err instanceof Error ? err.message : "An error occurred");
         } finally {

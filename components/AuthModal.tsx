@@ -5,6 +5,7 @@ import { X, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { login, signup } from "@/app/actions";
 
 export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const [isLogin, setIsLogin] = useState(true);
@@ -24,36 +25,67 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
         setError(null);
         setMessage(null);
 
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        if (!isLogin) {
+            formData.append('username', username);
+        }
+
         try {
             if (isLogin) {
-                // Sign in
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
-
-                if (error) throw error;
-
-                onClose();
-                // Use window.location for a hard redirect to ensure session is picked up
-                window.location.href = '/dashboard';
+                // Server action handles redirect on success
+                const response = await login(formData);
+                if (response?.error) {
+                    setError(response.error);
+                } else {
+                    // Successful login will redirect, so we can just close the modal
+                    // The redirect might cause the component to unmount before this runs, which is fine
+                    onClose();
+                }
             } else {
-                // Sign up
-                const { error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            username: username,
-                        },
-                    },
-                });
-
-                if (error) throw error;
-
-                setMessage("Check your email for the confirmation link!");
+                const response = await signup(formData);
+                if (response?.error) {
+                    setError(response.error);
+                } else if (response?.success) {
+                    setMessage(response.success);
+                    // Clear form
+                    setPassword("");
+                }
             }
         } catch (err) {
+            // Next.js redirects throw an error, we need to catch it?
+            // Actually, redirects from Server Actions in Client Components typically work without catching if not inside try/catch that blocks it?
+            // But here we are inside try/catch.
+            // If it's a redirect error, we should let it bubble or ignore it.
+            // However, typical pattern for server action returning error object doesn't throw.
+            // But `redirect()` in server action DOES throw.
+            // So we need to re-throw if it's a NEXT_REDIRECT error.
+            // But we can simplfy: create a client-side wrapper or just handle the error string return.
+            // The `login` action returns { error } OR throws a redirect.
+            // So if it throws, it's likely the redirect.
+            
+            // NOTE: The `redirect` function throws an error, so we need to avoid catching it as a generic error.
+            // BUT, since we are calling it from an async function in a client component:
+            // "When a Server Action is invoked from a Client Component... if the action redirects... the promise will reject..." is NOT how it works usually. The client router handles the redirect instruction.
+            
+            // Let's assume standard behavior: `login` action containing `redirect()` will cause the `await login()` to essentially "never return" or return a specific result that Next.js client handles?
+            // Actually, typically you shouldn't put `redirect` inside a try/catch if you want it to work easily, OR rethrow.
+            // But checking Next.js docs: "Redirects... throw a NEXT_REDIRECT error".
+            // So if I catch generic error, I prevent redirect.
+            
+            // Let's modify the server action to NOT redirect, but return success, and let Client redirect?
+            // NO, the plan was Server-Side redirect.
+            // So I should check if the error is a digest "NEXT_REDIRECT" or similar.
+            // OR simpler: don't try/catch the redirect-causing action?
+            // But I needed try/catch for other errors?
+            // The `login` action only returns if there is an auth error. If it succeeds, it redirects.
+            // So if `await login()` returns, it's an error (or void if I messed up types).
+            // Actually `login` returns `Promise<void | { error: string }>`
+            
+            // Wait, if `redirect` throws, it throws on the SERVER side. The Client Action invocation receives the redirect instruction.
+            // It does NOT throw an error in the browser.
+            // So `try...catch` here wrapping the server action call catches NETWORK errors or exceptions, but NOT the redirect "error" which happens on server.
             setError(err instanceof Error ? err.message : "An error occurred");
         } finally {
             setLoading(false);
