@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Exo_2, Roboto, Orbitron } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthModalProvider } from "@/components/providers/auth-modal-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -57,6 +58,7 @@ export default function RootLayout({
         >
           <AuthModalProvider>
             {children}
+            <Toaster />
           </AuthModalProvider>
         </ThemeProvider>
       </body>

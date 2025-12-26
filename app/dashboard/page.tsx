@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import DashboardClient from "./DashboardClient";
+import OverviewView from "./OverviewView";
 
 export default async function DashboardPage() {
     const supabase = await createClient();
@@ -19,5 +19,5 @@ export default async function DashboardPage() {
         .eq("id", user.id)
         .single();
 
-    return <DashboardClient user={user} profile={profile} />;
+    return <OverviewView user={user} profile={profile} />;
 }
