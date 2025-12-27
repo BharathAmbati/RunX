@@ -71,8 +71,8 @@ const iconAnimations = {
 const navItems = [
     { name: "Overview", url: "/dashboard", icon: Home, animKey: "Home" },
     { name: "Activity", url: "/dashboard/activity", icon: Activity, animKey: "Activity" },
-    { name: "Leaderboard", url: "/dashboard/leaderboard", icon: Trophy, animKey: "Leaderboard" },
     { name: "Club", url: "/dashboard/club", icon: Users, animKey: "Club" },
+    { name: "Leaderboard", url: "/dashboard/leaderboard", icon: Trophy, animKey: "Leaderboard" },
     { name: "Learn", url: "/dashboard/learn", icon: Zap, animKey: "Learn" },
     { name: "Settings", url: "/dashboard/settings", icon: Settings, animKey: "Settings" },
 ];
