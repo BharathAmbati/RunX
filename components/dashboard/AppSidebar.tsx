@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Trophy, Settings, LogOut, Activity, Zap, ChevronUp, User2 } from "lucide-react";
+import { Home, Trophy, Settings, LogOut, Activity, Zap, ChevronUp, User2, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/app/actions";
@@ -60,12 +60,19 @@ const iconAnimations = {
         transition: { duration: 0.5, ease: "easeInOut" as const },
         whileHover: { rotate: 180, scale: 1.1 },
     },
+    Club: {
+        initial: { scale: 1 },
+        animate: { scale: [1, 1.2, 1] },
+        transition: { duration: 0.8, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" as const },
+        whileHover: { scale: 1.25, x: 3 },
+    },
 };
 
 const navItems = [
     { name: "Overview", url: "/dashboard", icon: Home, animKey: "Home" },
     { name: "Activity", url: "/dashboard/activity", icon: Activity, animKey: "Activity" },
     { name: "Leaderboard", url: "/dashboard/leaderboard", icon: Trophy, animKey: "Leaderboard" },
+    { name: "Club", url: "/dashboard/club", icon: Users, animKey: "Club" },
     { name: "Learn", url: "/dashboard/learn", icon: Zap, animKey: "Learn" },
     { name: "Settings", url: "/dashboard/settings", icon: Settings, animKey: "Settings" },
 ];

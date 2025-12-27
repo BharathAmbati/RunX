@@ -3,46 +3,24 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-    Users, TrendingUp, MapPin, Target, Trophy, Calendar, 
-    Zap, Play, Route, Timer, Activity, ArrowRight, CheckCircle2 
+import {
+    Users, TrendingUp, MapPin, Target, Trophy, Calendar,
+    Zap, Play, Route, Timer, Activity, ArrowRight, CheckCircle2
 } from "lucide-react";
 import { Magnetic } from "@/components/ui/magnetic";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { StatCard } from "@/components/dashboard/overview/StatCard";
 import { ActivityFeed, ActivityItem } from "@/components/dashboard/overview/ActivityFeed";
 import { OverviewGrid } from "@/components/dashboard/overview/OverviewGrid";
-import { toast } from "sonner"; // Assuming sonner is available, or we'll use a standard alert for now if not.
-
-// Mock Data Generators
-const generateActivity = (type: "run" | "achievement" | "social", title: string, desc: string): ActivityItem => ({
-    id: Math.random().toString(36).substr(2, 9),
-    title,
-    desc,
-    date: "Just now",
-    icon: type === "run" ? Activity : type === "achievement" ? Trophy : Users,
-    color: type === "run" ? "text-cyan-400" : type === "achievement" ? "text-yellow-400" : "text-purple-400",
-    type
-});
-
-interface DashboardClientProps {
-    user: {
-        email?: string;
-        user_metadata: {
-            username?: string;
-            full_name?: string;
-        };
-    } | null;
-    profile: {
-        username: string | null;
-        full_name: string | null;
-    } | null;
-}
+import { QuickTimer } from "@/components/dashboard/overview/QuickTimer";
 
 export default function OverviewView({ user, profile }: DashboardClientProps) {
     const displayName = profile?.username || profile?.full_name || user?.user_metadata?.username || user?.email?.split('@')[0] || "Runner";
 
     // State
+    const [showTimer, setShowTimer] = useState(false);
+    
+    // ... rest of state
     const [stats, setStats] = useState([
         { id: 'dist', label: "Total Distance", value: 2432, unit: "km", icon: MapPin, color: "text-cyan-400", trend: "+12.5%", trendUp: true },
         { id: 'time', label: "Total Time", value: 186, unit: "hrs", icon: Timer, color: "text-purple-400", trend: "+5.2%", trendUp: true },
@@ -66,9 +44,7 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
     };
 
     const handlePlanRoute = () => {
-        toast.info("Opening Route Planner...");
-        // Simulate
-        setTimeout(() => toast.success("Route 'Downtown Loop' added to achievements"), 1500);
+        router.push("/dashboard/routes");
     };
 
     const handleDownloadReport = () => {
@@ -81,6 +57,9 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
 
     return (
         <div className="space-y-8 pb-20">
+             {/* Timer Modal */}
+             <QuickTimer isOpen={showTimer} onClose={() => setShowTimer(false)} />
+
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
@@ -88,27 +67,27 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
                         Overview (Beta)
                     </h1>
                     <p className="text-zinc-400">
-                        Welcome back, <span className="text-cyan-400 font-semibold">{displayName}</span>. 
+                        Welcome back, <span className="text-cyan-400 font-semibold">{displayName}</span>.
                         Ready to break some records?
                     </p>
                 </div>
                 <div className="flex gap-3">
-                   <Magnetic>
-                        <button 
+                    <Magnetic>
+                        <button
                             onClick={handleDownloadReport}
                             className="px-4 py-2 bg-zinc-800/50 hover:bg-zinc-800 text-zinc-300 rounded-xl text-sm font-medium transition-colors border border-white/5 backdrop-blur-sm"
                         >
                             Export Data
                         </button>
-                   </Magnetic>
+                    </Magnetic>
                 </div>
             </div>
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                 <Magnetic intensity={0.2}>
-                    <GradientButton 
-                        variant="cyan" 
+                <Magnetic intensity={0.2}>
+                    <GradientButton
+                        variant="cyan"
                         className="w-full justify-between group"
                         onClick={handleStartRun}
                     >
@@ -120,9 +99,9 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
                         </div>
                         <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
                     </GradientButton>
-                 </Magnetic>
-                 
-                 <Magnetic intensity={0.2}>
+                </Magnetic>
+
+                <Magnetic intensity={0.2}>
                     <GradientButton variant="purple" className="w-full justify-between group" onClick={handlePlanRoute}>
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-black/20 rounded-lg"><Route className="w-5 h-5" /></div>
@@ -130,23 +109,27 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
                         </div>
                         <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
                     </GradientButton>
-                 </Magnetic>
+                </Magnetic>
 
-                 <Magnetic intensity={0.2}>
-                    <GradientButton variant="orange" className="w-full justify-between group">
+                <Magnetic intensity={0.2}>
+                    <GradientButton 
+                        variant="orange" 
+                        className="w-full justify-between group" 
+                        onClick={() => setShowTimer(true)}
+                    >
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-black/20 rounded-lg"><Timer className="w-5 h-5" /></div>
                             <span className="font-bold">Set Timer</span>
                         </div>
                         <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
                     </GradientButton>
-                 </Magnetic>
+                </Magnetic>
             </div>
 
             {/* Stats Grid */}
             <OverviewGrid>
                 {stats.map((stat, i) => (
-                    <StatCard 
+                    <StatCard
                         key={stat.id}
                         label={stat.label}
                         value={`${stat.value}${stat.unit ? ' ' + stat.unit : ''}`}
@@ -160,18 +143,18 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
             </OverviewGrid>
 
             {/* Main Content Area */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-8">
                 {/* Left Col: Goal & Chart (Placeholder for chart) */}
-                <div className="lg:col-span-2 space-y-8">
-                     {/* Weekly Goal */}
-                    <motion.div 
+                <div className="space-y-8">
+                    {/* Weekly Goal */}
+                    <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="p-8 rounded-3xl bg-gradient-to-br from-zinc-900/90 to-zinc-900/50 border border-white/10 relative overflow-hidden"
                     >
-                         <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                         
-                         <div className="relative z-10">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+
+                        <div className="relative z-10">
                             <div className="flex justify-between items-start mb-6">
                                 <div>
                                     <h3 className="text-xl font-bold text-white font-exo2">Weekly Goal</h3>
@@ -188,7 +171,7 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
                             </div>
 
                             <div className="h-4 bg-zinc-800 rounded-full overflow-hidden mb-2">
-                                <motion.div 
+                                <motion.div
                                     className="h-full bg-gradient-to-r from-cyan-500 to-blue-600"
                                     initial={{ width: 0 }}
                                     animate={{ width: `${Math.min(100, (weeklyGoal.current / weeklyGoal.target) * 100)}%` }}
@@ -199,7 +182,7 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
                                 <span className="text-cyan-400 font-medium">{Math.min(100, Math.round((weeklyGoal.current / weeklyGoal.target) * 100))}% Completed</span>
                                 <span className="text-zinc-500">{(weeklyGoal.target - weeklyGoal.current).toFixed(1)} km remaining</span>
                             </div>
-                         </div>
+                        </div>
                     </motion.div>
 
                     {/* Placeholder for future detailed chart */}
@@ -209,11 +192,6 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
                             <p>Detailed Activity Chart coming soon...</p>
                         </div>
                     </div>
-                </div>
-
-                {/* Right Col: Activity Feed */}
-                <div className="h-full">
-                    <ActivityFeed items={activities} />
                 </div>
             </div>
         </div>
