@@ -7,12 +7,20 @@ import {
     Users, TrendingUp, MapPin, Target, Trophy, Calendar,
     Zap, Play, Route, Timer, Activity, ArrowRight, CheckCircle2
 } from "lucide-react";
+import { toast } from "sonner";
 import { Magnetic } from "@/components/ui/magnetic";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { StatCard } from "@/components/dashboard/overview/StatCard";
 import { ActivityFeed, ActivityItem } from "@/components/dashboard/overview/ActivityFeed";
 import { OverviewGrid } from "@/components/dashboard/overview/OverviewGrid";
+
 import { QuickTimer } from "@/components/dashboard/overview/QuickTimer";
+import { User } from "@supabase/supabase-js";
+
+interface DashboardClientProps {
+    user: User;
+    profile: any;
+}
 
 export default function OverviewView({ user, profile }: DashboardClientProps) {
     const displayName = profile?.username || profile?.full_name || user?.user_metadata?.username || user?.email?.split('@')[0] || "Runner";
