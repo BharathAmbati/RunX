@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Trophy, Settings, LogOut, Activity, Zap, ChevronUp, User2, Users } from "lucide-react";
+import { Home, Trophy, Settings, LogOut, Activity, Zap, ChevronUp, User2, Users, HeartPulse } from "lucide-react";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/app/actions";
@@ -54,6 +54,12 @@ const iconAnimations = {
         transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" as const },
         whileHover: { scale: 1.3, rotate: [0, -10, 10, 0] },
     },
+    Recover: {
+        initial: { scale: 1 },
+        animate: { scale: [1, 1.2, 1] },
+        transition: { duration: 1, repeat: Infinity, repeatDelay: 1, ease: "easeInOut" as const },
+        whileHover: { scale: 1.25, color: "#34d399" }, // Emerald color on hover
+    },
     Settings: {
         initial: { rotate: 0 },
         animate: { rotate: 0 },
@@ -69,12 +75,69 @@ const iconAnimations = {
 };
 
 const navItems = [
-    { name: "Overview", url: "/dashboard", icon: Home, animKey: "Home" },
-    { name: "Activity", url: "/dashboard/activity", icon: Activity, animKey: "Activity" },
-    { name: "Club", url: "/dashboard/club", icon: Users, animKey: "Club" },
-    { name: "Leaderboard", url: "/dashboard/leaderboard", icon: Trophy, animKey: "Leaderboard" },
-    { name: "Learn", url: "/dashboard/learn", icon: Zap, animKey: "Learn" },
-    { name: "Settings", url: "/dashboard/settings", icon: Settings, animKey: "Settings" },
+    { 
+        name: "Overview", 
+        url: "/dashboard", 
+        icon: Home, 
+        animKey: "Home",
+        activeColor: "text-cyan-400",
+        activeBg: "bg-cyan-500/10",
+        activeShadow: "shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+    },
+    { 
+        name: "Activity", 
+        url: "/dashboard/activity", 
+        icon: Activity, 
+        animKey: "Activity",
+        activeColor: "text-cyan-400",
+        activeBg: "bg-cyan-500/10",
+        activeShadow: "shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+    },
+    { 
+        name: "Club", 
+        url: "/dashboard/club", 
+        icon: Users, 
+        animKey: "Club",
+        activeColor: "text-cyan-400",
+        activeBg: "bg-cyan-500/10",
+        activeShadow: "shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+    },
+    { 
+        name: "Leaderboard", 
+        url: "/dashboard/leaderboard", 
+        icon: Trophy, 
+        animKey: "Leaderboard",
+        activeColor: "text-cyan-400",
+        activeBg: "bg-cyan-500/10",
+        activeShadow: "shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+    },
+    { 
+        name: "Learn", 
+        url: "/dashboard/learn", 
+        icon: Zap, 
+        animKey: "Learn",
+        activeColor: "text-orange-400",
+        activeBg: "bg-orange-500/10",
+        activeShadow: "shadow-[0_0_15px_rgba(249,115,22,0.1)]"
+    },
+    { 
+        name: "Recover", 
+        url: "/dashboard/recover", 
+        icon: HeartPulse, 
+        animKey: "Recover",
+        activeColor: "text-emerald-400",
+        activeBg: "bg-emerald-500/10",
+        activeShadow: "shadow-[0_0_15px_rgba(52,211,153,0.1)]"
+    },
+    { 
+        name: "Settings", 
+        url: "/dashboard/settings", 
+        icon: Settings, 
+        animKey: "Settings",
+        activeColor: "text-cyan-400",
+        activeBg: "bg-cyan-500/10",
+        activeShadow: "shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+    },
 ];
 
 export function AppSidebar() {
@@ -159,7 +222,7 @@ export function AppSidebar() {
                                             tooltip={item.name}
                                             className={`transition-all duration-300 ${
                                                 isActive
-                                                    ? "bg-cyan-500/10 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                                                    ? `${item.activeBg} ${item.activeColor} ${item.activeShadow}`
                                                     : "text-zinc-500 hover:text-white hover:bg-white/5"
                                             }`}
                                         >
@@ -170,7 +233,14 @@ export function AppSidebar() {
                                                     whileHover={anim.whileHover}
                                                     transition={anim.transition || { duration: 0.3 }}
                                                 >
-                                                    <item.icon className={`w-4 h-4 ${isActive ? "fill-current" : ""}`} />
+                                                    <item.icon 
+                                                        className={`w-4 h-4 ${
+                                                            isActive ? "fill-current" : ""
+                                                        } ${
+                                                            item.name === "Learn" ? "text-orange-400" :
+                                                            item.name === "Recover" ? "text-emerald-400" : ""
+                                                        }`} 
+                                                    />
                                                 </motion.div>
                                                 <span className="font-medium group-data-[collapsible=icon]:hidden">{item.name}</span>
                                             </Link>

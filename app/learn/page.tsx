@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import PowerSection from "@/components/PowerSection";
+import RecoverSection from "@/components/RecoverSection";
 
 export default function LearnPage() {
     return (
@@ -7,6 +8,7 @@ export default function LearnPage() {
             <Navbar />
             <div className="pt-20">
                 <PowerSection />
+                <RecoverSection />
             </div>
 
             {/* Footer */}
