@@ -75,8 +75,17 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
                 // Verify coordsString is valid
                 if(!coordsString) return;
 
-                const response = await fetch(`https://router.project-osrm.org/route/v1/foot/${coordsString}?overview=full&geometries=geojson`);
-                if (!response.ok) throw new Error('Failed to fetch route');
+                // Add timeout to prevent hanging
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const response = await fetch(
+                    `https://router.project-osrm.org/route/v1/foot/${coordsString}?overview=full&geometries=geojson`,
+                    { signal: controller.signal }
+                );
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error('Route API unavailable');
                 const data = await response.json();
 
                 if (data.routes && data.routes.length > 0) {
@@ -89,9 +98,8 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
                     setDistance(distKm);
                     if (onDistanceUpdate) onDistanceUpdate(parseFloat(distKm));
                 }
-            } catch (error) {
-                console.error("OSRM Fetch Error:", error);
-                // Fallback to straight lines if API fails
+            } catch {
+                // Silently fallback to straight lines if API fails (network issues, timeout, etc.)
                 setRouteGeometry([...markers]);
                 const dist = calculateTotalDistance(markers);
                 setDistance(dist);
