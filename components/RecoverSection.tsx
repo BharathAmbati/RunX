@@ -24,7 +24,8 @@ import {
     Clock,
     Info
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { fetchExerciseVideo } from "@/utils/fetchExerciseVideo";
 
 // Pre-run and Post-run nutrition data with 3 meal plan options (Indian foods)
 // ... (nutritionData remains unchanged)
@@ -202,7 +203,11 @@ const muscleExercises = [
                     male: "/exercises/male/quad_foam_roll.png",
                     female: "/exercises/female/quad_foam_roll.png"
                 },
-                video: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", // Sample placeholder
+                videoQueries: {
+                    male: "foam rolling quadriceps tutorial male athlete",
+                    female: "foam rolling quadriceps tutorial female athlete"
+                },
+                video: "", 
                 steps: ["Position roller under thigh", "Roll slowly from hip to knee", "Pause 20-30 sec on tender areas", "Repeat 8-10 passes"]
             },
             { 
@@ -212,6 +217,10 @@ const muscleExercises = [
                 images: {
                     male: "/exercises/male/quad_stretch.png",
                     female: "/exercises/female/quad_stretch.png"
+                },
+                videoQueries: {
+                    male: "standing quad stretch tutorial men",
+                    female: "standing quad stretch tutorial women"
                 },
                 video: "",
                 steps: ["Stand on one leg near wall", "Grab ankle behind you", "Pull heel toward glute", "Keep knees close together"]
@@ -223,6 +232,10 @@ const muscleExercises = [
                 images: {
                     male: "/exercises/male/couch_stretch.png",
                     female: "/exercises/female/couch_stretch.png"
+                },
+                videoQueries: {
+                    male: "couch stretch hip flexor quad men tutorial",
+                    female: "couch stretch hip flexor quad women tutorial"
                 },
                 video: "",
                 steps: ["Kneel facing away from wall", "Place back foot against wall", "Front leg at 90 degrees", "Lean back into stretch"]
@@ -242,6 +255,10 @@ const muscleExercises = [
                     male: "/exercises/male/forward_fold.png",
                     female: "/exercises/female/forward_fold.png"
                 },
+                videoQueries: {
+                    male: "seated forward fold hamstring stretch men",
+                    female: "seated forward fold hamstring stretch women yoga"
+                },
                 video: "",
                 steps: ["Sit with legs extended", "Inhale, lengthen spine", "Exhale, fold from hips", "Reach for feet or shins"]
             },
@@ -253,6 +270,10 @@ const muscleExercises = [
                     male: "/exercises/male/single_leg_deadlift.png",
                     female: "/exercises/female/single_leg_deadlift.png"
                 },
+                videoQueries: {
+                    male: "single leg deadlift tutorial men proper form",
+                    female: "single leg deadlift tutorial women proper form"
+                },
                 video: "",
                 steps: ["Stand on one leg", "Hinge forward at hips", "Extend back leg behind", "Return to standing slowly"]
             },
@@ -263,6 +284,10 @@ const muscleExercises = [
                 images: {
                     male: "/exercises/male/supine_stretch.png",
                     female: "/exercises/female/supine_stretch.png"
+                },
+                videoQueries: {
+                    male: "supine hamstring stretch with strap men",
+                    female: "supine hamstring stretch with strap women"
                 },
                 video: "",
                 steps: ["Lie on back", "Raise one leg up", "Use strap around foot", "Gently pull leg toward you"]
@@ -282,6 +307,10 @@ const muscleExercises = [
                     male: "/exercises/male/calf_raise.png",
                     female: "/exercises/female/calf_raise.png"
                 },
+                videoQueries: {
+                    male: "eccentric calf raises tutorial men runners",
+                    female: "eccentric calf raises tutorial women runners"
+                },
                 video: "",
                 steps: ["Stand on edge of step", "Rise up on toes", "Lower heels slowly (3 sec)", "Feel stretch at bottom"]
             },
@@ -293,6 +322,10 @@ const muscleExercises = [
                     male: "/exercises/male/wall_calf_stretch.png",
                     female: "/exercises/female/wall_calf_stretch.png"
                 },
+                videoQueries: {
+                    male: "wall calf stretch tutorial men",
+                    female: "wall calf stretch tutorial women"
+                },
                 video: "",
                 steps: ["Face wall, hands on wall", "Step one foot back", "Keep back heel down", "Lean into wall"]
             },
@@ -303,6 +336,10 @@ const muscleExercises = [
                 images: {
                     male: "/exercises/male/tennis_ball_roll.png",
                     female: "/exercises/female/tennis_ball_roll.png"
+                },
+                videoQueries: {
+                    male: "tennis ball foot massage plantar fascia men",
+                    female: "tennis ball foot massage plantar fascia women"
                 },
                 video: "",
                 steps: ["Stand on tennis ball", "Roll under arch", "Apply pressure to sore spots", "Move to heel and toes"]
@@ -322,6 +359,10 @@ const muscleExercises = [
                     male: "/exercises/male/hip_90_90.png",
                     female: "/exercises/female/hip_90_90.png"
                 },
+                videoQueries: {
+                    male: "90 90 hip stretch mobility men tutorial",
+                    female: "90 90 hip stretch mobility women tutorial"
+                },
                 video: "",
                 steps: ["Sit with legs in 90-90 position", "Front leg bent 90 degrees out", "Back leg bent 90 degrees in", "Rotate torso over front leg"]
             },
@@ -333,6 +374,10 @@ const muscleExercises = [
                     male: "/exercises/male/kneeling_hip.png",
                     female: "/exercises/female/kneeling_hip.png"
                 },
+                videoQueries: {
+                    male: "half kneeling hip flexor stretch men",
+                    female: "half kneeling hip flexor stretch women"
+                },
                 video: "",
                 steps: ["Kneel on one knee", "Front foot flat on floor", "Squeeze back glute", "Shift weight forward slightly"]
             },
@@ -343,6 +388,10 @@ const muscleExercises = [
                 images: {
                     male: "/exercises/male/leg_swings.png",
                     female: "/exercises/female/leg_swings.png"
+                },
+                videoQueries: {
+                    male: "leg swings dynamic warm up men runners",
+                    female: "leg swings dynamic warm up women runners"
                 },
                 video: "",
                 steps: ["Stand beside wall for balance", "Swing leg forward and back", "Keep core engaged", "Increase range gradually"]
@@ -362,6 +411,10 @@ const muscleExercises = [
                     male: "/exercises/male/it_band_roll.png",
                     female: "/exercises/female/it_band_roll.png"
                 },
+                videoQueries: {
+                    male: "foam rolling IT band tutorial men",
+                    female: "foam rolling IT band tutorial women"
+                },
                 video: "",
                 steps: ["Lie on side on roller", "Position at outer thigh", "Roll from hip to knee", "Pause on tight spots"]
             },
@@ -373,6 +426,10 @@ const muscleExercises = [
                     male: "/exercises/male/pigeon_pose.png",
                     female: "/exercises/female/pigeon_pose.png"
                 },
+                videoQueries: {
+                    male: "pigeon pose yoga stretch men hip opener",
+                    female: "pigeon pose yoga stretch women hip opener"
+                },
                 video: "",
                 steps: ["Start in downward dog", "Bring knee behind wrist", "Extend back leg straight", "Fold forward over front leg"]
             },
@@ -383,6 +440,10 @@ const muscleExercises = [
                 images: {
                     male: "/exercises/male/side_leg_raise.png",
                     female: "/exercises/female/side_leg_raise.png"
+                },
+                videoQueries: {
+                    male: "side lying leg raises hip abduction men",
+                    female: "side lying leg raises hip abduction women"
                 },
                 video: "",
                 steps: ["Lie on side, legs stacked", "Lift top leg 45 degrees", "Keep hips stacked", "Lower with control"]
@@ -402,7 +463,11 @@ const muscleExercises = [
                     male: "/exercises/male/cat_cow.png",
                     female: "/exercises/female/cat_cow.png"
                 },
-                video: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", // Sample placeholder
+                videoQueries: {
+                    male: "cat cow stretch tutorial men back pain",
+                    female: "cat cow stretch tutorial women yoga"
+                },
+                video: "",
                 steps: ["Start on hands and knees", "Inhale, arch back (cow)", "Exhale, round spine (cat)", "Move slowly with breath"]
             },
             { 
@@ -412,6 +477,10 @@ const muscleExercises = [
                 images: {
                     male: "/exercises/male/child_pose.png",
                     female: "/exercises/female/child_pose.png"
+                },
+                videoQueries: {
+                    male: "child's pose yoga stretch tutorial men",
+                    female: "child's pose yoga stretch tutorial women"
                 },
                 video: "",
                 steps: ["Kneel on floor", "Sit back on heels", "Reach arms forward", "Rest forehead on floor"]
@@ -423,6 +492,10 @@ const muscleExercises = [
                 images: {
                     male: "/exercises/male/dead_bug.png",
                     female: "/exercises/female/dead_bug.png"
+                },
+                videoQueries: {
+                    male: "dead bug core exercise tutorial men",
+                    female: "dead bug core exercise tutorial women"
                 },
                 video: "",
                 steps: ["Lie on back, arms up", "Legs at 90 degrees", "Extend opposite arm/leg", "Keep lower back pressed down"]
@@ -467,11 +540,32 @@ function ExerciseModal({
     gender: 'male' | 'female';
 }) {
     const [isPlaying, setIsPlaying] = useState(false);
+    const [fetchedVideoUrl, setFetchedVideoUrl] = useState<string | null>(null);
+    const [isLoadingVideo, setIsLoadingVideo] = useState(false);
+
+    // Reset state when modal opens/closes
+    useEffect(() => {
+        if (!isOpen) {
+            setIsPlaying(false);
+            setFetchedVideoUrl(null);
+            setIsLoadingVideo(false);
+        }
+    }, [isOpen]);
 
     if (!exercise) return null;
 
-    // Reset state when modal opens/closes
-    if (!isOpen && isPlaying) setIsPlaying(false);
+    const handleStart = async () => {
+        setIsPlaying(true);
+        const query = exercise.videoQueries?.[gender];
+        if (query && !fetchedVideoUrl) {
+            setIsLoadingVideo(true);
+            const url = await fetchExerciseVideo(query);
+            if (url) {
+                setFetchedVideoUrl(url);
+            }
+            setIsLoadingVideo(false);
+        }
+    };
 
     return (
         <AnimatePresence>
@@ -522,21 +616,40 @@ function ExerciseModal({
                             className={`relative bg-black overflow-hidden ${isPlaying ? 'flex-1 h-full' : 'h-64 md:h-80 bg-gradient-to-b from-zinc-800 to-zinc-900'}`}
                         >
                             <AnimatePresence mode="wait">
-                                {isPlaying && exercise.video ? (
+                                {isPlaying ? (
                                     <motion.div
                                         key="video"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="w-full h-full flex items-center justify-center"
+                                        className="w-full h-full flex items-center justify-center bg-black"
                                     >
-                                        <video
-                                            src={exercise.video}
-                                            autoPlay
-                                            controls
-                                            loop
-                                            className="w-full h-full object-contain"
-                                        />
+                                        {isLoadingVideo ? (
+                                            <div className="flex flex-col items-center gap-4 text-emerald-400">
+                                                <div className="w-8 h-8 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+                                                <span className="text-sm font-medium">Fetching demonstration...</span>
+                                            </div>
+                                        ) : fetchedVideoUrl ? (
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                src={`${fetchedVideoUrl}?autoplay=1&modestbranding=1&rel=0`}
+                                                title={exercise.name}
+                                                allow="autoplay; encrypted-media"
+                                                allowFullScreen
+                                                className="w-full h-full border-none"
+                                            />
+                                        ) : exercise.video ? (
+                                            <video
+                                                src={exercise.video}
+                                                autoPlay
+                                                controls
+                                                loop
+                                                className="w-full h-full object-contain"
+                                            />
+                                        ) : (
+                                           <div className="text-zinc-500">Video unavailable</div>
+                                        )}
                                     </motion.div>
                                 ) : (
                                     <motion.div
@@ -613,7 +726,7 @@ function ExerciseModal({
                                 <motion.button
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
-                                    onClick={() => setIsPlaying(true)}
+                                    onClick={handleStart}
                                     className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
                                 >
                                     <Play className="w-5 h-5 fill-white" />

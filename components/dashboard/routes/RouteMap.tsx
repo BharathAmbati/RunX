@@ -80,7 +80,7 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
 
                 const response = await fetch(
-                    `https://router.project-osrm.org/route/v1/foot/${coordsString}?overview=full&geometries=geojson`,
+                    `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${coordsString}?overview=full&geometries=geojson`,
                     { signal: controller.signal }
                 );
                 clearTimeout(timeoutId);
@@ -98,7 +98,8 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
                     setDistance(distKm);
                     if (onDistanceUpdate) onDistanceUpdate(parseFloat(distKm));
                 }
-            } catch {
+            } catch (error) {
+                console.warn("Route fetch failed, falling back to straight lines:", error);
                 // Silently fallback to straight lines if API fails (network issues, timeout, etc.)
                 setRouteGeometry([...markers]);
                 const dist = calculateTotalDistance(markers);
