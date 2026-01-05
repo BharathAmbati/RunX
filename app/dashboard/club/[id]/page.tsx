@@ -6,7 +6,8 @@ import { ArrowLeft, MapPin, Users, Calendar, Trophy, Share2, MessageSquare, Cloc
 import { GradientButton } from "@/components/ui/gradient-button";
 import { clubs } from "@/components/dashboard/club/data";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ClubLeaderboard } from "@/components/dashboard/club/ClubLeaderboard";
 
 export default function ClubDetailPage() {
     const params = useParams();
@@ -17,6 +18,13 @@ export default function ClubDetailPage() {
     const club = clubs.find(c => c.id === clubId);
     
     const [isJoined, setIsJoined] = useState(false);
+
+    useEffect(() => {
+        const joinedId = localStorage.getItem('joinedClubId');
+        if (joinedId && Number(joinedId) === clubId) {
+            setIsJoined(true);
+        }
+    }, [clubId]);
 
     if (!club) {
         return (
@@ -33,25 +41,30 @@ export default function ClubDetailPage() {
     }
 
     const handleJoin = () => {
-        setIsJoined(!isJoined);
-        toast.success(isJoined ? "Left the club" : "Welcome to the club! Members info unlocked.");
+        if (isJoined) {
+            // Leave Logic
+            setIsJoined(false);
+            localStorage.removeItem('joinedClubId');
+            toast.success("You have left the club.");
+            router.push("/dashboard/club");
+        } else {
+             // Join Logic
+            setIsJoined(true);
+            localStorage.setItem('joinedClubId', clubId.toString());
+            toast.success("Welcome to the club! Members info unlocked.");
+        }
     };
 
     return (
         <div className="space-y-8 pb-20 max-w-5xl mx-auto">
             {/* Header / Hero */}
-            <div className="relative rounded-[3rem] overflow-hidden bg-zinc-900 border border-white/5 min-h-[350px]">
+            <div className="relative rounded-[3rem] overflow-hidden bg-zinc-900 border border-white/5">
                 {/* Background Art */}
                 <div className={`absolute top-0 right-0 w-[500px] h-[500px] ${club.bg.replace('/10', '/20')} rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2`} />
                 
-                <div className="relative z-10 p-8 md:p-10 h-full flex flex-col items-start justify-between min-h-[350px]">
+                <div className="relative z-10 p-8 md:p-10 flex flex-col items-start justify-center">
                     {/* Back Button - In flow */}
-                    <button 
-                        onClick={() => router.back()}
-                        className="p-3 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors backdrop-blur-md border border-white/10 mb-8"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
+
 
                     <div className="space-y-4 w-full">
                         <div className="flex flex-wrap gap-2">
@@ -85,7 +98,7 @@ export default function ClubDetailPage() {
                     className="flex-1 md:flex-none min-w-[200px]"
                     onClick={handleJoin}
                 >
-                    {isJoined ? "Joined" : "Join Club"}
+                    {isJoined ? "Exit Club" : "Join Club"}
                 </GradientButton>
                 <button className="px-6 py-3 rounded-xl bg-zinc-800 border border-white/5 text-white hover:bg-zinc-700 transition-colors font-medium flex items-center gap-2">
                     <Share2 className="w-4 h-4" />
@@ -109,7 +122,12 @@ export default function ClubDetailPage() {
                         </p>
                     </div>
 
-                    {/* Members Section (Unlocked when joined) */}
+                    {/* Combined Leaderboard Section */}
+                    <div id="leaderboard-section">
+                         <ClubLeaderboard />
+                    </div>
+
+                    {/* Members Section (Unlocked when joined) - Keeping mock logic simple for now, can be removed if Leaderboard covers it */}
                     {isJoined && club.memberList && (
                         <motion.div 
                             initial={{ opacity: 0, height: 0 }}

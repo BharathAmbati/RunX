@@ -42,12 +42,7 @@ const iconAnimations = {
         transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" as const },
         whileHover: { scale: 1.3, y: -2 },
     },
-    Leaderboard: {
-        initial: { y: 0 },
-        animate: { y: [0, -3, 0] },
-        transition: { duration: 0.6, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" as const },
-        whileHover: { scale: 1.2, rotate: 15 },
-    },
+
     Learn: {
         initial: { opacity: 1, scale: 1 },
         animate: { opacity: [1, 0.7, 1], scale: [1, 1.1, 1] },
@@ -102,15 +97,7 @@ const navItems = [
         activeBg: "bg-cyan-500/10",
         activeShadow: "shadow-[0_0_15px_rgba(6,182,212,0.1)]"
     },
-    { 
-        name: "Leaderboard", 
-        url: "/dashboard/leaderboard", 
-        icon: Trophy, 
-        animKey: "Leaderboard",
-        activeColor: "text-cyan-400",
-        activeBg: "bg-cyan-500/10",
-        activeShadow: "shadow-[0_0_15px_rgba(6,182,212,0.1)]"
-    },
+
     { 
         name: "Learn", 
         url: "/dashboard/learn", 

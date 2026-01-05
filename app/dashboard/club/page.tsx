@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "motion/react";
 import { Users, MapPin, ExternalLink, UserPlus, Info, Check } from "lucide-react";
 import { GradientButton } from "@/components/ui/gradient-button";
@@ -12,6 +13,14 @@ export default function ClubPage() {
     const router = useRouter();
     const [joinedClubs, setJoinedClubs] = useState<number[]>([]);
 
+    useEffect(() => {
+        // Auto-redirect if already joined a club
+        const joinedId = localStorage.getItem('joinedClubId');
+        if (joinedId) {
+            router.push(`/dashboard/club/${joinedId}`);
+        }
+    }, [router]);
+
     const handleJoin = (id: number, name: string) => {
         if (joinedClubs.includes(id)) {
             toast.info(`You are already a member of ${name}`);
@@ -22,7 +31,13 @@ export default function ClubPage() {
             loading: 'Sending join request...',
             success: () => {
                 setJoinedClubs([...joinedClubs, id]);
-                return `Welcome to ${name}!`;
+                // Persist joined state
+                localStorage.setItem('joinedClubId', id.toString());
+                // Redirect to club details page after joining
+                setTimeout(() => {
+                    router.push(`/dashboard/club/${id}`);
+                }, 1500);
+                return `Welcome to ${name}! Redirecting...`;
             },
             error: 'Failed to join club',
         });
