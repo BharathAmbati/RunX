@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
-import { fetchExerciseVideo } from "@/utils/fetchExerciseVideo";
+
 import {
     Play,
     BookOpen,
@@ -453,7 +453,7 @@ const howToRunTopics = [
         title: "Perfect Form",
         description: "Master the art of efficient running posture",
         icon: Activity,
-        videoQuery: "perfect running form technique explained",
+        videoQuery: "https://www.youtube.com/embed/brFHyOtTwH4",
         color: "from-blue-500 to-cyan-500"
     },
     {
@@ -461,7 +461,7 @@ const howToRunTopics = [
         title: "Rhythmic Breathing",
         description: "Optimizing oxygen intake for endurance",
         icon: Wind,
-        videoQuery: "how to breathe while running without getting tired",
+        videoQuery: "https://www.youtube.com/embed/Mb2b97LuoYY",
         color: "from-emerald-500 to-teal-500"
     },
     {
@@ -469,7 +469,7 @@ const howToRunTopics = [
         title: "Pacing Strategy",
         description: "Finding and maintaining your ideal speed",
         icon: Timer,
-        videoQuery: "running pacing strategy for beginners",
+        videoQuery: "https://www.youtube.com/embed/D70BtefKJRU",
         color: "from-orange-500 to-red-500"
     },
     {
@@ -477,7 +477,7 @@ const howToRunTopics = [
         title: "Hill Mastery",
         description: "Techniques for climbing and descending",
         icon: Mountain,
-        videoQuery: "how to run hills proper technique",
+        videoQuery: "https://www.youtube.com/embed/fPfr5V8gmF4",
         color: "from-purple-500 to-pink-500"
     },
     {
@@ -485,7 +485,7 @@ const howToRunTopics = [
         title: "Essential Gear",
         description: "Choosing the right shoes and apparel",
         icon: ShoppingBag,
-        videoQuery: "running gear essentials for beginners",
+        videoQuery: "https://www.youtube.com/embed/KL0ok_UpPak",
         color: "from-yellow-500 to-orange-500"
     },
     {
@@ -493,7 +493,7 @@ const howToRunTopics = [
         title: "Warm-up & Cool-down",
         description: "Preventing injury and aiding recovery",
         icon: Heart,
-        videoQuery: "running warm up and cool down routine",
+        videoQuery: "https://www.youtube.com/embed/fkgmhXiaS-Y",
         color: "from-rose-500 to-red-500"
     }
 ];
@@ -508,24 +508,6 @@ function VideoModal({
     isOpen: boolean;
     onClose: () => void;
 }) {
-    const [videoUrl, setVideoUrl] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        if (isOpen && video?.videoQuery) {
-            setIsLoading(true);
-            setVideoUrl(null);
-            fetchExerciseVideo(video.videoQuery).then((url) => {
-                setVideoUrl(url);
-                setIsLoading(false);
-            });
-        }
-        if (!isOpen) {
-            setVideoUrl(null);
-            setIsLoading(false);
-        }
-    }, [isOpen, video?.videoQuery]);
-
     if (!video) return null;
 
     return (
@@ -564,16 +546,11 @@ function VideoModal({
 
                         {/* Video Area */}
                         <div className="aspect-video bg-black flex items-center justify-center">
-                            {isLoading ? (
-                                <div className="flex flex-col items-center gap-4 text-cyan-400">
-                                    <div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
-                                    <span className="text-sm font-medium">Loading video...</span>
-                                </div>
-                            ) : videoUrl ? (
+                            {video.videoQuery ? (
                                 <iframe
                                     width="100%"
                                     height="100%"
-                                    src={`${videoUrl}?autoplay=1&modestbranding=1&rel=0`}
+                                    src={`${video.videoQuery}?autoplay=1&modestbranding=1&rel=0`}
                                     title={video.title}
                                     allow="autoplay; encrypted-media"
                                     allowFullScreen
