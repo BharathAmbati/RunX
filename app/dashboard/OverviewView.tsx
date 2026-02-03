@@ -1,58 +1,147 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import {
-    Users, TrendingUp, MapPin, Target, Trophy, Calendar,
-    Zap, Play, Route, Timer, Activity, ArrowRight, CheckCircle2
+    TrendingUp,
+    MapPin,
+    Target,
+    Zap,
+    Route,
+    Timer,
+    Activity,
+    ArrowRight,
+    RefreshCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Magnetic } from "@/components/ui/magnetic";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { StatCard } from "@/components/dashboard/overview/StatCard";
-import { ActivityFeed, ActivityItem } from "@/components/dashboard/overview/ActivityFeed";
 import { OverviewGrid } from "@/components/dashboard/overview/OverviewGrid";
 
-import { QuickTimer } from "@/components/dashboard/overview/QuickTimer";
+import { ActivityFeed, ActivityItem } from "@/components/dashboard/overview/ActivityFeed";
+import { ActivityChart } from "@/components/dashboard/overview/ActivityChart";
+import { Calendar, CloudLightning } from "lucide-react";
 import { User } from "@supabase/supabase-js";
+
+type OverviewData = {
+    totals: {
+        distanceKm: number;
+        timeHours: number;
+        runsCount: number;
+        calories: number;
+    };
+    weekly: {
+        currentKm: number;
+        targetKm: number;
+    };
+    recentRuns: Array<{
+        id: string;
+        name: string | null;
+        start_date: string | null;
+        distance_m: number;
+        moving_time_s: number;
+        calories: number;
+        sport_type: string | null;
+    }>;
+};
+
+type Profile = {
+    username?: string | null;
+    full_name?: string | null;
+    weekly_goal_km?: number | null;
+} | null;
 
 interface DashboardClientProps {
     user: User;
-    profile: any;
+    profile: Profile;
+    overview: OverviewData;
 }
 
-export default function OverviewView({ user, profile }: DashboardClientProps) {
+export default function OverviewView({ user, profile, overview }: DashboardClientProps) {
     const displayName = profile?.username || profile?.full_name || user?.user_metadata?.username || user?.email?.split('@')[0] || "Runner";
 
     // State
-    const [showTimer, setShowTimer] = useState(false);
-    
-    // ... rest of state
-    const [stats, setStats] = useState([
-        { id: 'dist', label: "Total Distance", value: 2432, unit: "km", icon: MapPin, color: "text-cyan-400", trend: "+12.5%", trendUp: true },
-        { id: 'time', label: "Total Time", value: 186, unit: "hrs", icon: Timer, color: "text-purple-400", trend: "+5.2%", trendUp: true },
-        { id: 'runs', label: "Total Runs", value: 142, unit: "", icon: Activity, color: "text-orange-400", trend: "+2", trendUp: true },
-        { id: 'cal', label: "Calories", value: 12500, unit: "kcal", icon: Zap, color: "text-rose-400", trend: "-2.1%", trendUp: false },
-    ]);
-
-    const [activities, setActivities] = useState<ActivityItem[]>([
-        { id: '1', title: "Morning Jog", desc: "5.2km in 28m", date: "2h ago", icon: Activity, color: "text-cyan-400", type: "run" },
-        { id: '2', title: "Weekly Goal Met", desc: "40km Streak", date: "Yesterday", icon: Target, color: "text-yellow-400", type: "achievement" },
-        { id: '3', title: "Club Run", desc: "Joined 'City Runners'", date: "2d ago", icon: Users, color: "text-purple-400", type: "social" },
-    ]);
-
-    const [weeklyGoal, setWeeklyGoal] = useState({ current: 28.5, target: 40 });
+    // State
+    const [isSyncing, setIsSyncing] = useState(false);
 
     const router = useRouter();
 
-    // Handlers
-    const handleStartRun = () => {
-        router.push("/dashboard/run");
+    const totals = overview?.totals ?? { distanceKm: 0, timeHours: 0, runsCount: 0, calories: 0 };
+    const weeklyGoal = {
+        current: overview?.weekly?.currentKm ?? 0,
+        target: overview?.weekly?.targetKm ?? 40,
     };
 
+    const stats = [
+        { id: "dist", label: "Total Distance", value: totals.distanceKm.toFixed(1), unit: "km", icon: MapPin, color: "text-cyan-400" },
+        { id: "time", label: "Total Time", value: totals.timeHours.toFixed(1), unit: "hrs", icon: Timer, color: "text-purple-400" },
+        { id: "runs", label: "Total Runs", value: totals.runsCount, unit: "", icon: Activity, color: "text-orange-400" },
+        { id: "cal", label: "Calories", value: Math.round(totals.calories), unit: "kcal", icon: Zap, color: "text-rose-400" },
+    ];
+
+    // Data Processing
+    const formatTime = (seconds: number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        if (h > 0) return `${h}h ${m}m`;
+        return `${m}m`;
+    };
+
+    const formatDate = (dateStr: string | null) => {
+        if (!dateStr) return "";
+        const d = new Date(dateStr);
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    };
+
+    const activities: ActivityItem[] = (overview.recentRuns || []).map((run) => ({
+        id: run.id,
+        title: run.name || "Untitled Run",
+        desc: `${(run.distance_m / 1000).toFixed(2)} km • ${formatTime(run.moving_time_s)} • ⚡ ${run.calories}`,
+        date: formatDate(run.start_date),
+        icon: run.sport_type === "Ride" ? Route : Activity, // Simple logic, can extend
+        color: "text-cyan-400",
+        type: "run",
+    }));
+
+    const chartData = (overview.recentRuns || []).map(run => ({
+        date: formatDate(run.start_date),
+        distance: run.distance_m ? parseFloat((run.distance_m / 1000).toFixed(2)) : 0,
+        time: formatTime(run.moving_time_s),
+        pace: "0:00/km" // Placeholder calculation
+    })).reverse(); // Show oldest to newest in chart if needed, ActivityChart handles slicing/reversing too but usually charts are chronological
+
+
+    // Handlers
+    // Handlers
     const handlePlanRoute = () => {
         router.push("/dashboard/routes");
+    };
+
+    const handleStravaSync = async () => {
+        setIsSyncing(true);
+        toast.info("Syncing with Strava...");
+        try {
+            const res = await fetch("/api/strava/sync", { method: "POST" });
+            const json = await res.json().catch(() => null);
+
+            if (!res.ok || !json?.ok) {
+                toast.error(json?.error || "Strava sync failed");
+                return;
+            }
+
+            if (json.totalUpserted === 0) {
+                toast.info("No new activities found");
+            } else {
+                toast.success(`Synced ${json.totalUpserted} new activities`);
+                router.refresh();
+            }
+        } catch (e) {
+            toast.error("Sync failed");
+        } finally {
+            setIsSyncing(false);
+        }
     };
 
     const handleDownloadReport = () => {
@@ -65,8 +154,7 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
 
     return (
         <div className="space-y-8 pb-20">
-             {/* Timer Modal */}
-             <QuickTimer isOpen={showTimer} onClose={() => setShowTimer(false)} />
+
 
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -92,23 +180,7 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Magnetic intensity={0.2}>
-                    <GradientButton
-                        variant="cyan"
-                        className="w-full justify-between group"
-                        onClick={handleStartRun}
-                    >
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-black/20 rounded-lg">
-                                <Play className="w-5 h-5" />
-                            </div>
-                            <span className="font-bold">Quick Start Run</span>
-                        </div>
-                        <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
-                    </GradientButton>
-                </Magnetic>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Magnetic intensity={0.2}>
                     <GradientButton variant="purple" className="w-full justify-between group" onClick={handlePlanRoute}>
                         <div className="flex items-center gap-3">
@@ -123,13 +195,18 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
                     <GradientButton 
                         variant="orange" 
                         className="w-full justify-between group" 
-                        onClick={() => setShowTimer(true)}
+                        onClick={handleStravaSync}
+                        disabled={isSyncing}
                     >
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-black/20 rounded-lg"><Timer className="w-5 h-5" /></div>
-                            <span className="font-bold">Set Timer</span>
+                            <div className="p-2 bg-black/20 rounded-lg">
+                                <RefreshCcw className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />
+                            </div>
+                            <span className="font-bold">
+                                {isSyncing ? "Syncing..." : "Sync from Strava"}
+                            </span>
                         </div>
-                        <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                        {!isSyncing && <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />}
                     </GradientButton>
                 </Magnetic>
             </div>
@@ -143,17 +220,15 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
                         value={`${stat.value}${stat.unit ? ' ' + stat.unit : ''}`}
                         icon={stat.icon}
                         color={stat.color}
-                        trend={stat.trend}
-                        trendUp={stat.trendUp}
                         delay={i * 0.1}
                     />
                 ))}
             </OverviewGrid>
 
             {/* Main Content Area */}
-            <div className="grid grid-cols-1 gap-8">
-                {/* Left Col: Goal & Chart (Placeholder for chart) */}
-                <div className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Col: Charts & Goals */}
+                <div className="lg:col-span-2 space-y-8">
                     {/* Weekly Goal */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -193,13 +268,27 @@ export default function OverviewView({ user, profile }: DashboardClientProps) {
                         </div>
                     </motion.div>
 
-                    {/* Placeholder for future detailed chart */}
-                    <div className="p-8 rounded-3xl bg-zinc-900/40 border border-white/5 min-h-[300px] flex items-center justify-center text-zinc-500">
-                        <div className="text-center">
-                            <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                            <p>Detailed Activity Chart coming soon...</p>
-                        </div>
-                    </div>
+                    {/* Activity Chart */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="h-[400px]"
+                    >
+                        <ActivityChart data={chartData} />
+                    </motion.div>
+                </div>
+
+                {/* Right Col: Recent Activity */}
+                <div className="lg:col-span-1 h-full min-h-[500px]">
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="h-full"
+                    >
+                        <ActivityFeed items={activities} className="h-full" />
+                    </motion.div>
                 </div>
             </div>
         </div>
