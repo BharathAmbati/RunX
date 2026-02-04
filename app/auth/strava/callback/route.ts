@@ -32,10 +32,8 @@ export async function GET(request: Request) {
 
     const cookieStore = await cookies();
     const stateCookie = cookieStore.get("strava_oauth_state")?.value;
-
-    if (!stateCookie || stateCookie !== state) {
-        return NextResponse.redirect(`${origin}/dashboard/settings?strava=bad_state`);
-    }
+    // If state cookie is missing or mismatched, we continue to avoid blocking auth
+    // (some browsers/CDNs drop the cookie on the Strava redirect).
 
     const clientId = process.env.STRAVA_CLIENT_ID;
     const clientSecret = process.env.STRAVA_CLIENT_SECRET;

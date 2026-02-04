@@ -49,6 +49,7 @@ export default function SettingsPage() {
     const [stravaAthleteId, setStravaAthleteId] = React.useState<number | null>(null);
     const [stravaLastSyncedAt, setStravaLastSyncedAt] = React.useState<string | null>(null);
     const [stravaSyncing, setStravaSyncing] = React.useState(false);
+    const [lastSyncError, setLastSyncError] = React.useState<string | null>(null);
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -80,7 +81,19 @@ export default function SettingsPage() {
                 .eq("user_id", user.id)
                 .maybeSingle();
 
-            if (error || !data) {
+            if (error) {
+                const errRecord = error as unknown as Record<string, unknown>;
+                const msg = String(errRecord?.message ?? "");
+                if (msg.toLowerCase().includes("strava_accounts") && msg.toLowerCase().includes("does not exist")) {
+                    toast.error("Missing DB tables. Run `supabase/strava_schema.sql` in Supabase.");
+                }
+                setStravaConnected(false);
+                setStravaAthleteId(null);
+                setStravaLastSyncedAt(null);
+                return;
+            }
+
+            if (!data) {
                 setStravaConnected(false);
                 setStravaAthleteId(null);
                 setStravaLastSyncedAt(null);
@@ -109,16 +122,36 @@ export default function SettingsPage() {
     const handleStravaSync = async () => {
         setStravaSyncing(true);
         try {
+            setLastSyncError(null);
             const res = await fetch("/api/strava/sync", { method: "POST" });
-            const json = await res.json().catch(() => null);
+            const text = await res.text();
+            let json: unknown = null;
+            if (text) {
+                try {
+                    json = JSON.parse(text);
+                } catch {
+                    json = null;
+                }
+            }
 
             if (!res.ok || !json?.ok) {
-                toast.error(json?.error || "Strava sync failed");
+                const jsonRecord = (json && typeof json === "object") ? (json as Record<string, unknown>) : null;
+                const errorText = jsonRecord && typeof jsonRecord.error === "string" ? jsonRecord.error : "Strava sync failed";
+                const detailsText = jsonRecord && typeof jsonRecord.details === "string" ? jsonRecord.details : null;
+                const detail = detailsText
+                    ? ` (${detailsText})`
+                    : text
+                      ? ` (${text})`
+                      : ` (HTTP ${res.status})`;
+                const message = `${errorText}${detail}`;
+                setLastSyncError(message);
+                toast.error(message);
                 return;
             }
 
             toast.success(`Imported ${json.totalUpserted} activities`);
             setStravaLastSyncedAt(new Date().toISOString());
+            setLastSyncError(null);
             router.refresh();
         } catch {
             toast.error("Strava sync failed");
@@ -316,6 +349,11 @@ export default function SettingsPage() {
                                 </Button>
                             }
                         />
+                        {lastSyncError && (
+                            <div className="text-xs text-rose-400 mt-2">
+                                {lastSyncError}
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </motion.div>
