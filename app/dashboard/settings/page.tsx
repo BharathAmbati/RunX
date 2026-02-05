@@ -125,19 +125,20 @@ export default function SettingsPage() {
             setLastSyncError(null);
             const res = await fetch("/api/strava/sync", { method: "POST" });
             const text = await res.text();
-            let json: unknown = null;
+            let json: Record<string, unknown> | null = null;
             if (text) {
                 try {
-                    json = JSON.parse(text);
+                    const parsed = JSON.parse(text);
+                    json = (parsed && typeof parsed === "object" && !Array.isArray(parsed)) ? parsed : null;
                 } catch {
                     json = null;
                 }
             }
 
-            if (!res.ok || !json?.ok) {
-                const jsonRecord = (json && typeof json === "object") ? (json as Record<string, unknown>) : null;
-                const errorText = jsonRecord && typeof jsonRecord.error === "string" ? jsonRecord.error : "Strava sync failed";
-                const detailsText = jsonRecord && typeof jsonRecord.details === "string" ? jsonRecord.details : null;
+            const isOk = json && json.ok === true;
+            if (!res.ok || !isOk) {
+                const errorText = json && typeof json.error === "string" ? json.error : "Strava sync failed";
+                const detailsText = json && typeof json.details === "string" ? json.details : null;
                 const detail = detailsText
                     ? ` (${detailsText})`
                     : text
@@ -149,7 +150,8 @@ export default function SettingsPage() {
                 return;
             }
 
-            toast.success(`Imported ${json.totalUpserted} activities`);
+            const totalUpserted = json && typeof json.totalUpserted === "number" ? json.totalUpserted : 0;
+            toast.success(`Imported ${totalUpserted} activities`);
             setStravaLastSyncedAt(new Date().toISOString());
             setLastSyncError(null);
             router.refresh();
@@ -158,6 +160,7 @@ export default function SettingsPage() {
         } finally {
             setStravaSyncing(false);
         }
+
     };
 
     const lastSyncedLabel = React.useMemo(() => {
