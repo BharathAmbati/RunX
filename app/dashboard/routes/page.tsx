@@ -1,12 +1,12 @@
 "use client";
 
 import dynamic from 'next/dynamic';
-import { useMemo, useState, useEffect } from 'react';
-import { ArrowLeft, Play, Timer, MapPin, Activity, Pause, Square } from 'lucide-react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
+import { ArrowLeft, Play, Pause, Square } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { GradientButton } from '@/components/ui/gradient-button';
 import { motion, AnimatePresence } from 'motion/react';
-import RunTracker from '@/components/dashboard/run/RunTracker'; // We reuse the metric grid logic or visuals if possible, or build a simplified one.
+import { toast } from 'sonner';
 
 // Simplified Tracker for the Left Panel (to match user request "same design as overview section quick start run")
 // We can actually just import RunTracker but constrain its width or build a focused version.
@@ -23,20 +23,22 @@ const formatTime = (seconds: number) => {
 };
 
 const ActiveRunPanel = ({
-    distance,
+    distanceLeft,
     time,
     heartRate,
     calories,
     pace,
+    progress,
     isPaused,
     onPauseToggle,
     onEndRun
 }: {
-    distance: number,
+    distanceLeft: number,
     time: string,
     heartRate: number,
     calories: number,
     pace: string,
+    progress: number,
     isPaused: boolean,
     onPauseToggle: () => void,
     onEndRun: () => void
@@ -50,7 +52,16 @@ const ActiveRunPanel = ({
         <div className="grid grid-cols-2 gap-8">
             <div className="space-y-1">
                 <h2 className="text-zinc-500 text-xs tracking-widest uppercase font-medium">Distance Left</h2>
-                <div className="text-3xl font-bold text-cyan-400 font-mono">{distance.toFixed(2)} km</div>
+                <div className="text-3xl font-bold text-cyan-400 font-mono">{distanceLeft.toFixed(2)} km</div>
+                <div className="mt-2">
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                            className="h-full bg-gradient-to-r from-cyan-500 to-blue-600"
+                            style={{ width: `${Math.round(progress * 100)}%` }}
+                        />
+                    </div>
+                    <div className="text-xs text-zinc-500 mt-1">{Math.round(progress * 100)}% completed</div>
+                </div>
             </div>
             <div className="space-y-1">
                 <h2 className="text-zinc-500 text-xs tracking-widest uppercase font-medium">Pace</h2>
@@ -90,15 +101,16 @@ export default function RoutePlannerPage() {
     const router = useRouter();
     const [isRunning, setIsRunning] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
-    const [currentDist, setCurrentDist] = useState(0);
+    const [plannedDistance, setPlannedDistance] = useState(0);
+    const [remainingDistance, setRemainingDistance] = useState(0);
     const [timeElapsed, setTimeElapsed] = useState(0);
 
     // Dynamic Metrics State
     const [heartRate, setHeartRate] = useState(145);
     const [calories, setCalories] = useState(0);
-    const [pace, setPace] = useState("5:30");
+    const [pace, setPace] = useState("0:00");
 
-    // Timer and Simulation effect
+    // Timer and metrics
     useEffect(() => {
         let interval: NodeJS.Timeout;
         if (isRunning && !isPaused) {
@@ -112,38 +124,27 @@ export default function RoutePlannerPage() {
                     return newTime;
                 });
 
-                // Simulate Heart Rate Fluctuation every second
-                setHeartRate(prev => {
-                    const change = Math.random() > 0.5 ? 1 : -1;
-                    const next = prev + change;
-                    // Keep between 140 and 160
-                    return Math.min(Math.max(next, 140), 160);
-                });
-
-                // Simulate Pace Fluctuation
-                setPace(prev => {
-                    // occasional change
-                    if (Math.random() > 0.7) {
-                        const seconds = 330 + Math.floor(Math.random() * 20 - 10); // 5:30 +/- 10s
-                        const m = Math.floor(seconds / 60);
-                        const s = seconds % 60;
-                        return `${m}:${s.toString().padStart(2, '0')}`;
-                    }
-                    return prev;
-                });
+                // Basic pace from distance covered
+                const covered = Math.max(plannedDistance - remainingDistance, 0);
+                if (covered > 0) {
+                    const paceSec = Math.floor(newTime / covered);
+                    const m = Math.floor(paceSec / 60);
+                    const s = paceSec % 60;
+                    setPace(`${m}:${s.toString().padStart(2, '0')}`);
+                }
 
             }, 1000);
         } else if (!isRunning) {
             setTimeElapsed(0);
             setCalories(0);
             setHeartRate(145);
-            setPace("5:30");
+            setPace("0:00");
             setIsPaused(false);
         }
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [isRunning, isPaused]);
+    }, [isRunning, isPaused, plannedDistance, remainingDistance]);
 
     const Map = useMemo(() => dynamic(
         () => import('@/components/dashboard/routes/RouteMap'),
@@ -159,6 +160,22 @@ export default function RoutePlannerPage() {
         setTimeElapsed(0);
         setCalories(0);
     };
+
+    const handleDistanceUpdate = useCallback(
+        (dist: number) => {
+            if (!isRunning) {
+                setPlannedDistance(dist);
+                setRemainingDistance(dist);
+            } else {
+                setRemainingDistance(dist);
+            }
+        },
+        [isRunning]
+    );
+
+    const progress = plannedDistance > 0
+        ? Math.min(1, Math.max(0, 1 - remainingDistance / plannedDistance))
+        : 0;
 
     return (
         <div className="relative w-full h-[calc(100vh-2rem)] rounded-3xl overflow-hidden border border-white/5 bg-zinc-900 flex">
@@ -188,11 +205,12 @@ export default function RoutePlannerPage() {
                         className="h-full bg-zinc-900 border-r border-white/5 relative z-10 hidden md:block" // Hidden on small screens or stack? User asked for "Map right side", implies split.
                     >
                         <ActiveRunPanel
-                            distance={currentDist}
+                            distanceLeft={remainingDistance}
                             time={formatTime(timeElapsed)}
                             heartRate={heartRate}
                             calories={calories}
                             pace={pace}
+                            progress={progress}
                             isPaused={isPaused}
                             onPauseToggle={() => setIsPaused(prev => !prev)}
                             onEndRun={handleEndRun}
@@ -203,14 +221,24 @@ export default function RoutePlannerPage() {
 
             {/* Right Panel (or Full) - Map */}
             <div className="flex-1 relative h-full">
-                <Map isRunning={isRunning} onDistanceUpdate={setCurrentDist} />
+                <Map
+                    isRunning={isRunning}
+                    isPaused={isPaused}
+                    onDistanceUpdate={handleDistanceUpdate}
+                />
 
                 {/* Start Button Overlay (Only when NOT running) */}
                 {!isRunning && (
                     <div className="absolute top-6 right-6 z-[1000]">
                         <GradientButton
                             variant="cyan"
-                            onClick={() => setIsRunning(true)}
+                            onClick={() => {
+                                if (plannedDistance <= 0) {
+                                    toast.error("Plot a route with at least 2 points before starting.");
+                                    return;
+                                }
+                                setIsRunning(true);
+                            }}
                             className="shadow-xl shadow-cyan-500/20"
                         >
                             <Play className="w-4 h-4 mr-2 fill-white" />

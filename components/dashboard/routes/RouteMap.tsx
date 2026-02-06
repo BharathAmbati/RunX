@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, useMapEvents } from 'react-leaflet';
 import L, { LatLngExpression } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin, RotateCcw, Save, Trash2 } from 'lucide-react';
+import { RotateCcw, Save, Trash2 } from 'lucide-react';
 import { GradientButton } from '@/components/ui/gradient-button';
 import { toast } from 'sonner';
 
@@ -24,7 +24,7 @@ const calculateTotalDistance = (points: LatLngExpression[]) => {
         const p2 = L.latLng(points[i + 1]);
         total += p1.distanceTo(p2);
     }
-    return (total / 1000).toFixed(2); // km
+    return total / 1000; // km
 };
 
 function MapEvents({ onMapClick }: { onMapClick: (e: L.LeafletMouseEvent) => void }) {
@@ -36,17 +36,21 @@ function MapEvents({ onMapClick }: { onMapClick: (e: L.LeafletMouseEvent) => voi
 
 interface RouteMapProps {
     isRunning: boolean;
+    isPaused?: boolean;
     onDistanceUpdate?: (dist: number) => void;
 }
 
-export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps) {
+export default function RouteMap({ isRunning, isPaused = false, onDistanceUpdate }: RouteMapProps) {
     // Default to San Francisco
     const [center, setCenter] = useState<LatLngExpression>([37.7749, -122.4194]);
     const [markers, setMarkers] = useState<LatLngExpression[]>([]);
-    const [distance, setDistance] = useState("0.00");
+    const [distance, setDistance] = useState(0);
     const [routeGeometry, setRouteGeometry] = useState<LatLngExpression[]>([]); // Dense path
     const [remainingRoute, setRemainingRoute] = useState<LatLngExpression[]>([]); // Dense path for sim
+    const [snappedPosition, setSnappedPosition] = useState<LatLngExpression | null>(null);
     const [isLoadingRoute, setIsLoadingRoute] = useState(false);
+    const watchIdRef = useRef<number | null>(null);
+    const locationErrorShownRef = useRef(false);
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -94,9 +98,9 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
                     const latLngs = route.geometry.coordinates.map((idx: number[]) => L.latLng(idx[1], idx[0]));
                     setRouteGeometry(latLngs);
                     
-                    const distKm = (route.distance / 1000).toFixed(2);
+                    const distKm = route.distance / 1000;
                     setDistance(distKm);
-                    if (onDistanceUpdate) onDistanceUpdate(parseFloat(distKm));
+                    if (onDistanceUpdate) onDistanceUpdate(distKm);
                 }
             } catch (error) {
                 console.warn("Route fetch failed, falling back to straight lines:", error);
@@ -104,7 +108,7 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
                 setRouteGeometry([...markers]);
                 const dist = calculateTotalDistance(markers);
                 setDistance(dist);
-                if (onDistanceUpdate) onDistanceUpdate(parseFloat(dist));
+                if (onDistanceUpdate) onDistanceUpdate(dist);
             } finally {
                 setIsLoadingRoute(false);
             }
@@ -113,47 +117,86 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
         if(!isRunning) {
             fetchRoute();
         }
-    }, [markers, isRunning]);
+    }, [markers, isRunning, onDistanceUpdate]);
 
-    // Initialize remaining route for simulation
+    // Initialize remaining route when run starts
     useEffect(() => {
         if (isRunning && routeGeometry.length > 0) {
             setRemainingRoute([...routeGeometry]);
         }
     }, [isRunning, routeGeometry]);
 
-    // Sync remaining distance during simulation
+    // Track user position to update remaining distance while running
     useEffect(() => {
-        if (isRunning && onDistanceUpdate) {
-            // Calculate distance of remaining path
-            // For a dense path, this is heavy. 
-            // Optimization: Approximate or Calculate once and subtract or recalculate only 'remaining' part
-            const remDist = calculateTotalDistance(remainingRoute);
-            onDistanceUpdate(parseFloat(remDist));
+        if (!isRunning || isPaused) {
+            if (watchIdRef.current !== null) {
+                navigator.geolocation.clearWatch(watchIdRef.current);
+                watchIdRef.current = null;
+            }
+            return;
         }
-    }, [remainingRoute, isRunning]);
 
-    // Simulation: "Run" the route (Dense Path Vanishing)
-    useEffect(() => {
-        if (!isRunning || remainingRoute.length === 0) return;
+        if (!navigator.geolocation) return;
+        locationErrorShownRef.current = false;
 
-        const interval = setInterval(() => {
-            setRemainingRoute(prev => {
-                if (prev.length <= 1) {
-                    clearInterval(interval);
-                    return prev;
+        watchIdRef.current = navigator.geolocation.watchPosition(
+            (pos) => {
+                if (!routeGeometry || routeGeometry.length < 2) return;
+
+                const current = L.latLng(pos.coords.latitude, pos.coords.longitude);
+                const points = routeGeometry.map((p) => L.latLng(p));
+
+                // Find nearest point index (sample to avoid heavy loops)
+                const step = Math.max(1, Math.floor(points.length / 200));
+                let nearestIndex = 0;
+                let nearestDist = Infinity;
+                for (let i = 0; i < points.length; i += step) {
+                    const d = current.distanceTo(points[i]);
+                    if (d < nearestDist) {
+                        nearestDist = d;
+                        nearestIndex = i;
+                    }
                 }
-                // Determine how many points to remove to simulate speed.
-                // OSRM points can be close or far.
-                // Let's remove chunks based on index for smoother "vanishing" animation than 1 point
-                // Remove 2-3 points per tick for visible progress on dense routes
-                const STEP = 2; 
-                return prev.slice(STEP);
-            });
-        }, 1000); 
 
-        return () => clearInterval(interval);
-    }, [isRunning]);
+                // Refine locally around nearest
+                const start = Math.max(0, nearestIndex - step);
+                const end = Math.min(points.length - 1, nearestIndex + step);
+                for (let i = start; i <= end; i += 1) {
+                    const d = current.distanceTo(points[i]);
+                    if (d < nearestDist) {
+                        nearestDist = d;
+                        nearestIndex = i;
+                    }
+                }
+
+                const remaining = points.slice(nearestIndex);
+                setRemainingRoute(remaining);
+                setSnappedPosition(remaining[0] ?? null);
+
+                let remainingMeters = 0;
+                for (let i = 0; i < remaining.length - 1; i += 1) {
+                    remainingMeters += remaining[i].distanceTo(remaining[i + 1]);
+                }
+                const remainingKm = remainingMeters / 1000;
+                if (onDistanceUpdate) onDistanceUpdate(remainingKm);
+            },
+            () => {
+                if (!locationErrorShownRef.current) {
+                    toast.error("Enable location to track route progress.");
+                    locationErrorShownRef.current = true;
+                }
+                // If location fails, keep existing remaining route
+            },
+            { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+        );
+
+        return () => {
+            if (watchIdRef.current !== null) {
+                navigator.geolocation.clearWatch(watchIdRef.current);
+                watchIdRef.current = null;
+            }
+        };
+    }, [isRunning, isPaused, routeGeometry, onDistanceUpdate]);
 
     const handleMapClick = (e: L.LeafletMouseEvent) => {
         if (isRunning || isLoadingRoute) return; 
@@ -164,7 +207,7 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
     const handleClear = () => {
         setMarkers([]);
         setRouteGeometry([]);
-        setDistance("0.00");
+        setDistance(0);
         if (onDistanceUpdate) onDistanceUpdate(0);
     };
 
@@ -178,7 +221,7 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
             toast.error("Plot a route with at least 2 points!");
             return;
         }
-        toast.success(`Route saved! Distance: ${distance} km`);
+        toast.success(`Route saved! Distance: ${distance.toFixed(2)} km`);
     };
 
     const handleDragEnd = (index: number, e: L.DragEndEvent) => {
@@ -211,6 +254,11 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
                         }}
                     />
                 ))}
+
+                {/* Snapped current position (while running) */}
+                {isRunning && snappedPosition && (
+                    <Marker position={snappedPosition} />
+                )}
                 
                 {/* Route Path (Polyline) */}
                 {/* Show simulated remaining route when running, else show full planned route */}
@@ -238,7 +286,7 @@ export default function RouteMap({ isRunning, onDistanceUpdate }: RouteMapProps)
                     <div className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl p-4 w-full flex justify-between items-center shadow-2xl">
                         <div>
                             <div className="text-zinc-400 text-xs uppercase tracking-widest font-medium">Total Distance</div>
-                            <div className="text-3xl font-bold text-white font-mono">{distance} <span className="text-sm text-zinc-500 font-sans">km</span></div>
+                            <div className="text-3xl font-bold text-white font-mono">{distance.toFixed(2)} <span className="text-sm text-zinc-500 font-sans">km</span></div>
                         </div>
                         
                         <div className="flex gap-2">
