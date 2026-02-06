@@ -121,18 +121,17 @@ export default function RoutePlannerPage() {
                     // Simulate Calories (approx 12 kcal/min for running)
                     setCalories(Math.floor(newTime * 0.2));
 
+                    // Basic pace from distance covered
+                    const covered = Math.max(plannedDistance - remainingDistance, 0);
+                    if (covered > 0) {
+                        const paceSec = Math.floor(newTime / covered);
+                        const m = Math.floor(paceSec / 60);
+                        const s = paceSec % 60;
+                        setPace(`${m}:${s.toString().padStart(2, '0')}`);
+                    }
+
                     return newTime;
                 });
-
-                // Basic pace from distance covered
-                const covered = Math.max(plannedDistance - remainingDistance, 0);
-                if (covered > 0) {
-                    const paceSec = Math.floor(newTime / covered);
-                    const m = Math.floor(paceSec / 60);
-                    const s = paceSec % 60;
-                    setPace(`${m}:${s.toString().padStart(2, '0')}`);
-                }
-
             }, 1000);
         } else if (!isRunning) {
             setTimeElapsed(0);
